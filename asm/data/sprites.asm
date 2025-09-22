@@ -1,16 +1,16 @@
 planes_init_loc: ; initial sprite coordinates for $d000-
 
-.byte $80, $60
-.byte $80, $A0
-.byte $C0, $60
-.byte $C0, $A0
+.byte $98, $78
+.byte $98, $98
+.byte $b8, $78
+.byte $b8, $98
 
 plane_shadows_init_loc:
 
-.byte $80, $68
-.byte $80, $a8
-.byte $C0, $68
-.byte $C0, $a8
+.byte $98, $80
+.byte $98, $a0
+.byte $b8, $80
+.byte $b8, $a0
 
 planes_init_color: ; sprite colors for $d027 -
 
