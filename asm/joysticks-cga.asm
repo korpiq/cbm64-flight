@@ -43,11 +43,5 @@ joys_read:
     LSR
     ORA joysticks+$03
     STA joysticks+$03
+
     RTS
-
-.data
-* = $0400
-joysticks:
-
-.byte 0,0,0,0
-

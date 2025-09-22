@@ -9,6 +9,7 @@
 .byte 11, 8, 221, 49, 158, 50, 48, 54, 49, 0, 0, 0 ; SYS2061
 *=2061
 start:
+    jsr planes_init
     jsr joys_init
     sei ; avoid blinking caused by interrupts
     LDA #%01111111
@@ -48,13 +49,8 @@ joys_irq:
     ASL $D019            ; acknowledge the interrupt by clearing the VIC's interrupt flag
     JMP $EA31            ; jump into KERNAL's standard interrupt service routine to handle keyboard scan, cursor display etc.
 
-next_raster:
-    lda $d012
-@wait:
-    cmp $d012
-    beq @wait
-    rts
-
-
 .include "joysticks-cga.asm"
+.include "plane-sprites.asm"
+
+.include "data/all.asm"
 .bss
