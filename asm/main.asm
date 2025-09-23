@@ -32,7 +32,7 @@ start:
 joys_irq:
     ; black line where our irq is called
     ldy $d020
-    ldx #$00
+    ldx plane_direction
     lda $d012
 @wait1:
     cmp $d012
@@ -45,11 +45,13 @@ joys_irq:
     sty $d020
 
     jsr joys_read
+    jsr players_move
 
     ASL $D019            ; acknowledge the interrupt by clearing the VIC's interrupt flag
     JMP $EA31            ; jump into KERNAL's standard interrupt service routine to handle keyboard scan, cursor display etc.
 
 .include "joysticks-cga.asm"
+.include "players-move.asm"
 .include "plane-sprites.asm"
 
 .include "data/all.asm"

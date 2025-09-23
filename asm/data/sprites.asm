@@ -22,6 +22,8 @@ planes_init_shape_ptr: ; sprite shapes for $07f8 -
 .byte $8d, $8a, $82, $86
 .byte $8d, $8a, $82, $86
 
+sprite_pointers = $07f8
+
 planes_shapes_data = $2000 ; sprite shapes copied to $40-byte boundary
 
 .include "../../sprites/plane.asm"
