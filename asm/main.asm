@@ -32,7 +32,7 @@ start:
 joys_irq:
     ; black line where our irq is called
     ldy $d020
-    ldx plane_direction
+    ldx #$00
     lda $d012
 @wait1:
     cmp $d012
@@ -46,6 +46,20 @@ joys_irq:
 
     jsr joys_read
     jsr players_move
+
+    ; black line where our irq is called
+    ldy $d020
+    ldx #$00
+    lda $d012
+@wait3:
+    cmp $d012
+    beq @wait3
+    stx $d020
+    lda $d012
+@wait4:
+    cmp $d012
+    beq @wait4
+    sty $d020
 
     ASL $D019            ; acknowledge the interrupt by clearing the VIC's interrupt flag
     JMP $EA31            ; jump into KERNAL's standard interrupt service routine to handle keyboard scan, cursor display etc.
