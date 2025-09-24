@@ -15,6 +15,15 @@ plane_dy:
 plane_dz:
     .byte 0,0,0,0
 
+plane_x_fragment:
+    .byte 0,0,0,0
+
+plane_y_fragment:
+    .byte 0,0,0,0
+
+plane_z_fragment:
+    .byte 0,0,0,0
+
 plane_z:
     .byte $80,$80,$80,$80
 

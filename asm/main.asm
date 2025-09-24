@@ -44,6 +44,7 @@ joys_irq:
     beq @wait2
     sty $d020
 
+    cld
     jsr joys_read
     jsr players_move
 
