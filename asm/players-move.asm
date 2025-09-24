@@ -99,7 +99,7 @@ players_move:
     clc
     lda plane_dy, x
     bmi @decrease_y
-; increase x
+; increase y
     adc plane_y_fragment, x
     sta plane_y_fragment, x
     bcc @y_done
