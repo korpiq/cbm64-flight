@@ -33,9 +33,9 @@ players_move:
     and #$3f
     tay
     lda coordinate_of_angle, y
-    sta plane_dx, x
-    eor #$ff
     sta plane_dy, x
+    eor #$ff
+    sta plane_dx, x
     jmp @delta_done
 @south_east:
     cmp #$80
@@ -43,6 +43,7 @@ players_move:
     and #$3f
     tay
     lda coordinate_of_angle, y
+    eor #$ff
     sta plane_dx, x
     sta plane_dy, x
     jmp @delta_done
@@ -52,15 +53,14 @@ players_move:
     and #$3f
     tay
     lda coordinate_of_angle, y
-    sta plane_dy, x
-    eor #$ff
     sta plane_dx, x
+    eor #$ff
+    sta plane_dy, x
     jmp @delta_done
 @north_west:
     and #$3f
     tay
     lda coordinate_of_angle, y
-    eor #$ff
     sta plane_dx, x
     sta plane_dy, x
 
@@ -78,7 +78,11 @@ players_move:
     asl
     tax
     inc $d000, x
+    inc $d000 + 8, x
+    lsr
+    tax
     jmp @x_done
+
 @decrease_x:
     adc plane_x_fragment, x
     sta plane_x_fragment, x
@@ -87,9 +91,39 @@ players_move:
     asl
     tax
     dec $d000, x
+    dec $d000 + 8, x
+    lsr
+    tax
 
 @x_done:
-; TODO: y
+    clc
+    lda plane_dy, x
+    bmi @decrease_y
+; increase x
+    adc plane_y_fragment, x
+    sta plane_y_fragment, x
+    bcc @y_done
+    txa
+    asl
+    tax
+    inc $d001, x
+    inc $d001 + 8, x
+    lsr
+    tax
+    jmp @y_done
+
+@decrease_y:
+    adc plane_y_fragment, x
+    sta plane_y_fragment, x
+    bcs @y_done
+    txa
+    asl
+    tax
+    dec $d001, x
+    dec $d001 + 8, x
+    lsr
+    tax
+
 @y_done:
     dex
     bmi @all_done
