@@ -4,7 +4,7 @@ plane_speed:
     .byte 8,8,8,8
 
 plane_direction:
-    .byte $e0,$20,$60,$a0
+    .byte $e0,$20,$a0,$60
 
 plane_dx:
     .byte 0,0,0,0

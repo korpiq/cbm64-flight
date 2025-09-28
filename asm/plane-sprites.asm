@@ -33,6 +33,12 @@ planes_init:
     sta $d027, x
     lda planes_init_shape_ptr, x
     sta $07f8, x
+    txa
+    pha
+    lda plane_direction, x
+    jsr set_plane_direction
+    pla
+    tax
     dex
     bpl @loop8
 
