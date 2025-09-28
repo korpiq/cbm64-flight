@@ -10,10 +10,10 @@ players_move:
 ; change direction
     and #$08
     beq @turn_left
-    lda #$04 ; turn right
+    lda #$02 ; turn right
     jmp @change_direction
 @turn_left:
-    lda #$fc
+    lda #$fe
 @change_direction:
     clc
     adc plane_direction,x

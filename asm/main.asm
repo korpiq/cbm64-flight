@@ -18,7 +18,7 @@ start:
     STA $D011
     STA $DC0D            ; acknowledge pending interrupts from CIA-1
     STA $DD0D            ; acknowledge pending interrupts from CIA-2
-    LDA #$A0             ; set rasterline where interrupt shall occur
+    LDA #$FF             ; set rasterline where interrupt shall occur
     STA $D012
     lda #<joys_irq       ; set interrupt vectors
     sta $0314
