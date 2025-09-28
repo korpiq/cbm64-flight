@@ -83,6 +83,7 @@ joys_irq:
     cld
     jsr joys_read
     jsr players_move
+    inc screen_drawing_round_counter
 
     ; black line where our irq is called
     ldy $d020

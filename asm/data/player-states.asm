@@ -27,3 +27,4 @@ plane_z_fragment:
 plane_z:
     .byte $80,$80,$80,$80
 
+screen_drawing_round_counter = $0a

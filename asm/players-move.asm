@@ -1,4 +1,6 @@
 
+.feature c_comments
+
 players_move:
     ldx #$03
 
@@ -30,21 +32,35 @@ players_move:
     txa
     asl
     tax
-    inc $d000, x
     inc $d000 + 8, x
+    inc $d000, x
+    bne @after_x_increased
+    lda sprite_bits_by_double_index, x
+    eor $d010
+    sta $d010
+    txa
+@after_x_increased:
     lsr
     tax
     jmp @x_done
 
 @decrease_x:
+    adc #$01 ; -1 = 0 so west is west and north is north
+    clc
     adc plane_x_fragment, x
     sta plane_x_fragment, x
     bcs @x_done
     txa
     asl
     tax
-    dec $d000, x
     dec $d000 + 8, x
+    dec $d000, x
+    bne @after_x_decreased
+    lda sprite_bits_by_double_index, x
+    eor $d010
+    sta $d010
+    txa
+@after_x_decreased:
     lsr
     tax
 
