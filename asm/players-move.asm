@@ -107,12 +107,12 @@ set_plane_direction: ; x = plane number 0-3; a = new direction 0 (North) - FF (1
 ; "NorthEast"
     tay
     lda coordinate_of_angle, y
-    sta plane_dx, x ; as is: the more off of north, the faster we go east
+    sta plane_dx, x
     tya
     eor #$3f ; index of coordinate of opposite angle
     tay
     lda coordinate_of_angle, y
-    eor #$ff ; negative opposite: we go north the slower the faster we go east
+    eor #$ff ; negative: go north
     sta plane_dy, x
     RTS
 
@@ -120,7 +120,7 @@ set_plane_direction: ; x = plane number 0-3; a = new direction 0 (North) - FF (1
     and #$3f
     tay
     lda coordinate_of_angle, y
-    sta plane_dy, x ; as is: the more toward south, the faster we go south
+    sta plane_dy, x
     tya
     eor #$3f ; index of coordinate of opposite angle
     tay
@@ -148,12 +148,12 @@ set_plane_direction: ; x = plane number 0-3; a = new direction 0 (North) - FF (1
     and #$3f
     tay
     lda coordinate_of_angle, y
-    eor #$80 ; negative opposite: the more toward north, the slower we go west
-    sta plane_dx, x
+    eor #$ff ; negative: go north
+    sta plane_dy, x
     tya
     eor #$3f ; index of coordinate of opposite angle
     tay
     lda coordinate_of_angle, y
-    eor #$80 ; negative opposite: the more toward north, the faster we go north
-    sta plane_dy, x
+    eor #$ff ; negative: go west
+    sta plane_dx, x
     RTS
