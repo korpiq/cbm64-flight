@@ -4,12 +4,13 @@ players_move:
 
 @each_player:
     lda joysticks,x
-    eor #$0f
-    and #$0c
-    beq @straight_ahead ; direction did not change
+    eor #$1f
+    and #$0c                ; 4 = left; 8 = right
+    beq @straight_ahead     ; direction did not change
 ; change direction
-    asl
-    sbc #$0c
+    asl                     ; 8 = left; 16 = right
+    sec
+    sbc #$0c                ; -= 12 => -4 = left; 4 = right
     adc plane_direction,x
     sta plane_direction,x
 ; set plane and shadow sprites point to correct direction

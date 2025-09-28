@@ -27,6 +27,42 @@ start:
     LDA #%00000001       ; enable raster interrupt signals from VIC
     STA $D01A
     cli
+debug_loop:
+    lda #$13             ; home
+    jsr $ffd2
+    ldx #$00
+@print_4_hex_row:
+    lda #$9a             ; light blue
+    jsr $ffd2
+    lda plane_speed, x
+    jsr print_hex
+    inx
+    lda #$96             ; pink
+    jsr $ffd2
+    lda plane_speed, x
+    jsr print_hex
+    inx
+    lda #$99             ; light green
+    jsr $ffd2
+    lda plane_speed, x
+    jsr print_hex
+    inx
+    lda #$9e             ; brown -> yellow
+    jsr $ffd2
+    lda plane_speed, x
+    jsr print_hex
+    lda #$0d
+    jsr $ffd2
+    inx
+    cpx #$24
+    bne @print_4_hex_row
+@wait_for_next_screen_draw:
+    lda $d012
+    bne @wait_for_next_screen_draw
+    lda $d011
+    and #$80
+    bne @wait_for_next_screen_draw
+    jmp debug_loop
     rts
 
 joys_irq:
@@ -68,6 +104,7 @@ joys_irq:
 .include "joysticks-cga.asm"
 .include "players-move.asm"
 .include "plane-sprites.asm"
+.include "print.asm"
 
 .include "data/all.asm"
 .bss

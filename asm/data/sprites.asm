@@ -14,7 +14,7 @@ plane_shadows_init_loc:
 
 planes_init_color: ; sprite colors for $d027 -
 
-.byte $0E, $0A, $0D, $08
+.byte $0E, $0A, $0D, $07
 .byte 0, 0, 0, 0
 
 planes_init_shape_ptr: ; sprite shapes for $07f8 -
