@@ -29,6 +29,12 @@ players_move:
     adc plane_x_fragment, x
     sta plane_x_fragment, x
     bcc @x_done
+    inc plane_x_lo, x
+    bne :+
+    lda plane_x_hi_bit, x
+    eor #$01
+    sta plane_x_hi_bit, x
+:
     txa
     asl
     tax
@@ -50,6 +56,15 @@ players_move:
     adc plane_x_fragment, x
     sta plane_x_fragment, x
     bcs @x_done
+    lda plane_x_lo, x
+    sec
+    sbc #$01
+    sta plane_x_lo, x
+    bcs :+
+    lda plane_x_hi_bit, x
+    eor #$01
+    sta plane_x_hi_bit, x
+:
     txa
     asl
     tax
@@ -59,6 +74,9 @@ players_move:
     lda sprite_bits_by_double_index, x
     eor $d010
     sta $d010
+    lda plane_x_hi_bit, x
+    eor #$01
+    sta plane_x_hi_bit, x
     txa
 @after_x_decreased:
     lsr
