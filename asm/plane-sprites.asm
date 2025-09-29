@@ -42,6 +42,20 @@ planes_init:
     dex
     bpl @loop8
 
+    ldx #$03
+@loop4: ; set plane locations
+    txa
+    asl
+    tay
+    lda planes_init_loc, y
+    sta plane_x_lo, x
+    lda #$00
+    sta plane_x_hi_bit, x
+    lda planes_init_loc + 1, y
+    sta plane_y, x
+    dex
+    bpl @loop4
+
     lda #$ff  ; set bits on
     sta $d015 ; enabled
 

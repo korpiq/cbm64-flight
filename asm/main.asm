@@ -27,10 +27,13 @@ start:
     LDA #%00000001       ; enable raster interrupt signals from VIC
     STA $D01A
     cli
+    lda #$93             ; home
+    jsr $ffd2
 debug_loop:
     lda #$13             ; home
     jsr $ffd2
     ldx #$00
+    ldy #$00
 @print_4_hex_row:
     lda #$9a             ; light blue
     jsr $ffd2
@@ -47,14 +50,34 @@ debug_loop:
     lda plane_speed, x
     jsr print_hex
     inx
-    lda #$9e             ; brown -> yellow
+    lda #$9e             ; yellow
     jsr $ffd2
     lda plane_speed, x
     jsr print_hex
-    lda #$0d
-    jsr $ffd2
     inx
-    cpx #$24
+
+    ; next we print title of this debug data row
+    lda #$9b             ; grey
+    jsr $ffd2
+    txa
+    pha ; save X until string printed
+    tya
+    pha ; save Y until string printed
+    lda debug_names_lo, y
+    pha
+    lda debug_names_hi, y
+    tay
+    pla
+    jsr $ab1e ; print debug name of row
+    lda #$0d ; newline
+    jsr $ffd2
+    pla ; restore y after printing
+    tay
+    iny
+    pla ; restore x after printing
+    tax
+
+    cpy #$0c
     bne @print_4_hex_row
 @wait_for_next_screen_draw:
     lda $d012
