@@ -90,7 +90,8 @@ debug_loop:
 
 joys_irq:
     ; black line where our irq is called
-    ldy $d020
+    lda $d020
+    pha
     ldx #$00
     lda $d012
 @wait1:
@@ -101,7 +102,8 @@ joys_irq:
 @wait2:
     cmp $d012
     beq @wait2
-    sty $d020
+    lda #$0f
+    sta $d020
 
     cld
     jsr joys_read
@@ -109,7 +111,6 @@ joys_irq:
     inc screen_drawing_round_counter
 
     ; black line where our irq is called
-    ldy $d020
     ldx #$00
     lda $d012
 @wait3:
@@ -120,7 +121,8 @@ joys_irq:
 @wait4:
     cmp $d012
     beq @wait4
-    sty $d020
+    pla
+    sta $d020
 
     ASL $D019            ; acknowledge the interrupt by clearing the VIC's interrupt flag
     JMP $EA31            ; jump into KERNAL's standard interrupt service routine to handle keyboard scan, cursor display etc.
