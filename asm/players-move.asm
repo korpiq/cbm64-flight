@@ -47,6 +47,7 @@ players_move:
     lda sprite_pair_bits_by_index, x
     eor $d010
     sta $d010
+    jmp @x_done
 
 @decrease_x:
     adc plane_x_fragment, x
