@@ -33,25 +33,22 @@ players_move:
     adc plane_x_fragment, x
     sta plane_x_fragment, x
     bcc @x_done
-; move sprite
-    inc plane_x_lo, x
-    bne :+
+; move sprite right
+    lda plane_x_lo, x
+    clc
+    adc #$01
+    sta plane_x_lo, x
+    sta $d000, y
+    bcc @x_done
     lda plane_x_hi_bit, x
     eor #$01
     sta plane_x_hi_bit, x
-:
-    lda plane_x_lo, x
-    sta $d000, y
-    bne @after_x_increased
 ; move plane and shadow sprites right over 8 bit boundary
     lda sprite_pair_bits_by_index, x
     eor $d010
     sta $d010
-@after_x_increased:
-    jmp @x_done
 
 @decrease_x:
-    clc
     adc plane_x_fragment, x
     sta plane_x_fragment, x
     bcs @x_done ; adding to two's complement sets carry unless sum is negative
@@ -60,24 +57,15 @@ players_move:
     sec
     sbc #$01
     sta plane_x_lo, x
-    bcs @decrease_sprite_x
+    sta $d000, y
+    bcs @x_done
     lda plane_x_hi_bit, x
     eor #$01
     sta plane_x_hi_bit, x
-@decrease_sprite_x:
-    lda plane_x_lo, x
-    sta $d000, y
-
-    bne @after_x_decreased
 ; move plane and shadow sprites left over 8 bit boundary
     lda sprite_pair_bits_by_index, x
     eor $d010
     sta $d010
-    lda plane_x_hi_bit, x
-    eor #$01
-    sta plane_x_hi_bit, x
-@after_x_decreased:
-
 @x_done:
     clc
     lda plane_dy, x
