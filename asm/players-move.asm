@@ -3,9 +3,10 @@
 
 players_move:
     ldx #$03
+    ldy #$03
 
 @each_player:
-    lda joysticks,x
+    lda joysticks,y
     eor #$1f
     and #$0c                ; 4 = left; 8 = right
     beq @straight_ahead     ; direction did not change
@@ -18,22 +19,24 @@ players_move:
     lda #$fe
 @change_direction:
     clc
-    adc plane_direction,x
-    jsr set_plane_direction
+    adc plane_direction,y
+    sty player_move_counter
+    jsr set_plane_direction ; TODO: protect Y from being modified here
+    ldy player_move_counter
 
 @straight_ahead:
     clc
-    lda plane_dx, x
+    lda plane_dx, y
     bmi @decrease_x
 ; increase x
-    adc plane_x_fragment, x
-    sta plane_x_fragment, x
+    adc plane_x_fragment, y
+    sta plane_x_fragment, y
     bcc @x_done
     inc plane_x_lo, x
     bne :+
-    lda plane_x_hi_bit, x
+    lda plane_x_hi_bit, y
     eor #$01
-    sta plane_x_hi_bit, x
+    sta plane_x_hi_bit, y
 :
     txa
     asl
@@ -53,17 +56,17 @@ players_move:
 @decrease_x:
     adc #$01 ; -1 = 0 so west is west and north is north
     clc
-    adc plane_x_fragment, x
-    sta plane_x_fragment, x
+    adc plane_x_fragment, y
+    sta plane_x_fragment, y
     bcs @x_done
-    lda plane_x_lo, x
+    lda plane_x_lo, y
     sec
     sbc #$01
-    sta plane_x_lo, x
+    sta plane_x_lo, y
     bcs :+
-    lda plane_x_hi_bit, x
+    lda plane_x_hi_bit, y
     eor #$01
-    sta plane_x_hi_bit, x
+    sta plane_x_hi_bit, y
 :
     txa
     asl
@@ -84,11 +87,11 @@ players_move:
 
 @x_done:
     clc
-    lda plane_dy, x
+    lda plane_dy, y
     bmi @decrease_y
 ; increase y
-    adc plane_y_fragment, x
-    sta plane_y_fragment, x
+    adc plane_y_fragment, y
+    sta plane_y_fragment, y
     bcc @y_done
     txa
     asl
@@ -100,8 +103,8 @@ players_move:
     jmp @y_done
 
 @decrease_y:
-    adc plane_y_fragment, x
-    sta plane_y_fragment, x
+    adc plane_y_fragment, y
+    sta plane_y_fragment, y
     bcs @y_done
     txa
     asl
@@ -112,6 +115,7 @@ players_move:
     tax
 
 @y_done:
+    dey
     dex
     bmi @all_done
     jmp @each_player
