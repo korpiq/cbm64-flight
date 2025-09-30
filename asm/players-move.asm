@@ -3,10 +3,12 @@
 
 players_move:
     ldx #$03
-    ldy #$03
+    ldy #$06
 
 @each_player:
-    lda joysticks,y
+    stx player_move_counter
+    sty player_sprite_offset
+    lda joysticks,x
     eor #$1f
     and #$0c                ; 4 = left; 8 = right
     beq @straight_ahead     ; direction did not change
@@ -19,102 +21,92 @@ players_move:
     lda #$fe
 @change_direction:
     clc
-    adc plane_direction,y
-    sty player_move_counter
-    jsr set_plane_direction ; TODO: protect Y from being modified here
-    ldy player_move_counter
+    adc plane_direction,x
+    jsr set_plane_direction
+    ldy player_sprite_offset
 
 @straight_ahead:
     clc
-    lda plane_dx, y
+    lda plane_dx, x
     bmi @decrease_x
 ; increase x
-    adc plane_x_fragment, y
-    sta plane_x_fragment, y
+    adc plane_x_fragment, x
+    sta plane_x_fragment, x
     bcc @x_done
+; move sprite
     inc plane_x_lo, x
     bne :+
-    lda plane_x_hi_bit, y
+    lda plane_x_hi_bit, x
     eor #$01
-    sta plane_x_hi_bit, y
+    sta plane_x_hi_bit, x
 :
-    txa
-    asl
-    tax
-    inc $d000 + 8, x
-    inc $d000, x
+    lda plane_x_lo, x
+    sta $d000, y
     bne @after_x_increased
-    lda sprite_bits_by_double_index, x
+; move plane and shadow sprites right over 8 bit boundary
+    lda sprite_pair_bits_by_index, x
     eor $d010
     sta $d010
-    txa
 @after_x_increased:
-    lsr
-    tax
     jmp @x_done
 
 @decrease_x:
-    adc #$01 ; -1 = 0 so west is west and north is north
     clc
-    adc plane_x_fragment, y
-    sta plane_x_fragment, y
-    bcs @x_done
-    lda plane_x_lo, y
+    adc plane_x_fragment, x
+    sta plane_x_fragment, x
+    bcs @x_done ; adding to two's complement sets carry unless sum is negative
+; move sprite
+    lda plane_x_lo, x
     sec
     sbc #$01
-    sta plane_x_lo, y
-    bcs :+
-    lda plane_x_hi_bit, y
+    sta plane_x_lo, x
+    bcs @decrease_sprite_x
+    lda plane_x_hi_bit, x
     eor #$01
-    sta plane_x_hi_bit, y
-:
-    txa
-    asl
-    tax
-    dec $d000 + 8, x
-    dec $d000, x
+    sta plane_x_hi_bit, x
+@decrease_sprite_x:
+    lda plane_x_lo, x
+    sta $d000, y
+
     bne @after_x_decreased
-    lda sprite_bits_by_double_index, x
+; move plane and shadow sprites left over 8 bit boundary
+    lda sprite_pair_bits_by_index, x
     eor $d010
     sta $d010
     lda plane_x_hi_bit, x
     eor #$01
     sta plane_x_hi_bit, x
-    txa
 @after_x_decreased:
-    lsr
-    tax
 
 @x_done:
     clc
-    lda plane_dy, y
+    lda plane_dy, x
     bmi @decrease_y
 ; increase y
-    adc plane_y_fragment, y
-    sta plane_y_fragment, y
+    adc plane_y_fragment, x
+    sta plane_y_fragment, x
     bcc @y_done
-    txa
-    asl
-    tax
-    inc $d001, x
-    inc $d001 + 8, x
-    lsr
-    tax
+    inc plane_y, x
+    lda plane_y, x
+    sta $d001, y
     jmp @y_done
 
 @decrease_y:
-    adc plane_y_fragment, y
-    sta plane_y_fragment, y
+    adc plane_y_fragment, x
+    sta plane_y_fragment, x
     bcs @y_done
-    txa
-    asl
-    tax
-    dec $d001, x
-    dec $d001 + 8, x
-    lsr
-    tax
+    dec plane_y, x
+    lda plane_y, x
+    sta $d001, y
 
 @y_done:
+; place shadow
+    lda plane_x_lo, x
+    sta $d008, y
+    lda plane_y, x
+    adc #$08
+    sta $d009, y
+    dey
     dey
     dex
     bmi @all_done
@@ -151,6 +143,7 @@ set_plane_direction: ; x = plane number 0-3; a = new direction 0 (North) - FF (1
     tay
     lda coordinate_of_angle, y
     eor #$ff ; negative: go north
+    adc #$01 ; range 0..-127 instead of 0..-128
     sta plane_dy, x
     RTS
 
@@ -174,6 +167,7 @@ set_plane_direction: ; x = plane number 0-3; a = new direction 0 (North) - FF (1
     tay
     lda coordinate_of_angle, y
     eor #$ff ; negative: go west
+    adc #$01 ; range 0..-127 instead of 0..-128
     sta plane_dx, x
     tya
     eor #$3f ; index of coordinate of opposite angle
@@ -187,11 +181,13 @@ set_plane_direction: ; x = plane number 0-3; a = new direction 0 (North) - FF (1
     tay
     lda coordinate_of_angle, y
     eor #$ff ; negative: go north
+    adc #$01 ; range 0..-127 instead of 0..-128
     sta plane_dy, x
     tya
     eor #$3f ; index of coordinate of opposite angle
     tay
     lda coordinate_of_angle, y
     eor #$ff ; negative: go west
+    adc #$01 ; range 0..-127 instead of 0..-128
     sta plane_dx, x
     RTS

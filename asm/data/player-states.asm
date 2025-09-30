@@ -36,6 +36,3 @@ plane_y:
 plane_z:
     .byte $80,$80,$80,$80
 
-screen_drawing_round_counter = $0a
-player_move_counter = $2a
-

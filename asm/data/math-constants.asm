@@ -7,6 +7,5 @@ coordinate_of_angle:
 bit_by_index:
 .byte 1,2,4,8,$10,$20,$40,$80
 
-sprite_bits_by_double_index:
-.byte $11, 0, $22, 0, $44, 0, $88, 0
-
+sprite_pair_bits_by_index:
+.byte $11, $22, $44, $88
