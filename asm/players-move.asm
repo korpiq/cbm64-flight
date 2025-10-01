@@ -92,30 +92,45 @@ players_move:
     dey
     dey
     dex
-    bmi @place_shadow
+    bmi @players_moved
     jmp @each_player
 
-@place_shadow:
+@players_moved:
     lda screen_drawing_round_counter
-    and #$03
+    and #$01
     tax
-    lda $07f8, x
-    sta $07ff
-    lda plane_x_lo, x
-    sta $d00e
-    lda plane_y, x
-    adc #$08
-    sta $d00f
+    ldy #$06
+    jsr place_shadow
+    lda screen_drawing_round_counter
+    and #$01
+    ora #$02
+    tax
+    ldy #$07
+    jmp place_shadow
+
+place_shadow: ; x = plane number 0-3; y = shadow sprite number 4-7
+    lda sprite_pointers, x ; shape
+    sta sprite_pointers, y
     lda plane_x_hi_bit, x
     bne @shadow_right
-    lda $d010
-    and #$7f
+    lda bit_by_index, y
+    eor #$ff
+    and $d010
     sta $d010
-    RTS
+    jmp @set_shadow_position
 @shadow_right:
-    lda $d010
-    ora #$80
+    lda bit_by_index, y
+    ora $d010
     sta $d010
+@set_shadow_position:
+    tya
+    asl
+    tay
+    lda plane_x_lo, x
+    sta $d000, y
+    lda plane_y, x
+    adc #$08
+    sta $d001, y
     RTS
 
 set_plane_direction: ; x = plane number 0-3; a = new direction 0 (North) - FF (1 degree West of North)
@@ -128,7 +143,6 @@ set_plane_direction: ; x = plane number 0-3; a = new direction 0 (North) - FF (1
     lsr
     ora #$80
     sta sprite_pointers, x
-    sta sprite_pointers + 4, x
     tya
 
 ; update dx and dy according to new direction

@@ -7,8 +7,8 @@ planes_init_loc: ; initial sprite coordinates for $d000-
 
 plane_shadows_init_loc:
 
-.byte $98, $80
-.byte $b8, $80
+.byte $0, $0
+.byte $0, $0
 .byte $98, $a0
 .byte $b8, $a0
 

@@ -32,7 +32,7 @@ planes_init:
     lda planes_init_color, x
     sta $d027, x
     lda planes_init_shape_ptr, x
-    sta $07f8, x
+    sta sprite_pointers, x
     txa
     pha
     lda plane_direction, x
