@@ -44,7 +44,7 @@ players_move:
     eor #$01
     sta plane_x_hi_bit, x
 ; move plane and shadow sprites right over 8 bit boundary
-    lda sprite_pair_bits_by_index, x
+    lda bit_by_index, x
     eor $d010
     sta $d010
     jmp @x_done
@@ -64,7 +64,7 @@ players_move:
     eor #$01
     sta plane_x_hi_bit, x
 ; move plane and shadow sprites left over 8 bit boundary
-    lda sprite_pair_bits_by_index, x
+    lda bit_by_index, x
     eor $d010
     sta $d010
 @x_done:
@@ -89,19 +89,33 @@ players_move:
     sta $d001, y
 
 @y_done:
-; place shadow
-    lda plane_x_lo, x
-    sta $d008, y
-    lda plane_y, x
-    adc #$08
-    sta $d009, y
     dey
     dey
     dex
-    bmi @all_done
+    bmi @place_shadow
     jmp @each_player
 
-@all_done:
+@place_shadow:
+    lda screen_drawing_round_counter
+    and #$03
+    tax
+    lda $07f8, x
+    sta $07ff
+    lda plane_x_lo, x
+    sta $d00e
+    lda plane_y, x
+    adc #$08
+    sta $d00f
+    lda plane_x_hi_bit, x
+    bne @shadow_right
+    lda $d010
+    and #$7f
+    sta $d010
+    RTS
+@shadow_right:
+    lda $d010
+    ora #$80
+    sta $d010
     RTS
 
 set_plane_direction: ; x = plane number 0-3; a = new direction 0 (North) - FF (1 degree West of North)
