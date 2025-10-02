@@ -6,6 +6,3 @@ coordinate_of_angle:
 
 bit_by_index:
 .byte 1,2,4,8,$10,$20,$40,$80
-
-sprite_pair_bits_by_index:
-.byte $11, $22, $44, $88

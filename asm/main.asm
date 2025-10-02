@@ -16,6 +16,8 @@ player_sprite_offset = $04
 start:
     jsr planes_init
     jsr joys_init
+    jsr sound_init
+    jsr start_plane_sounds
     sei ; avoid blinking caused by interrupts
     LDA #%01111111
     STA $DC0D            ; switch off interrupt signals from CIA-1
@@ -113,6 +115,8 @@ joys_irq:
     cld
     jsr joys_read
     jsr players_move
+    jsr update_plane_sounds
+
     inc screen_drawing_round_counter
 
     ; black line where our irq is called
@@ -136,6 +140,7 @@ joys_irq:
 .include "players-move.asm"
 .include "plane-sprites.asm"
 .include "print.asm"
+.include "sound/all.asm"
 
 .include "data/all.asm"
 .bss
