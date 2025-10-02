@@ -7,6 +7,7 @@
 screen_drawing_round_counter = $02
 player_move_counter = $03
 player_sprite_offset = $04
+sound_buffer = $05
 
 *=$0801
 .word * ; first two bytes of a PRG file: starting memory address to load rest of the file at

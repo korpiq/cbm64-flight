@@ -4,7 +4,7 @@ start_plane_sounds:
     sta $d418
     lda #$4a
     sta $d405 ; Attack&Decay
-    lda #$24
+    lda #$44
     sta $d406 ; Sustain&Release
     lda #$10
     sta $d401
@@ -14,13 +14,11 @@ start_plane_sounds:
 
 update_plane_sounds:
     ldx #$03
-    lda #$0
+    lda #$10
 @loop:
     adc joysticks, x
+    asl
     dex
     bpl @loop
-    asl
-    asl
-    asl
     sta $d401
     rts
