@@ -1,7 +1,7 @@
 
 
 plane_speed:
-    .byte 8,8,8,8
+    .byte $20,$20,$20,$20
 
 plane_direction:
     .byte $e0,$20,$a0,$60
