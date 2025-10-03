@@ -6,12 +6,15 @@ players_move:
     ldy #$06
 
 @each_player:
-    stx player_move_counter
     sty player_sprite_offset
+    lda plane_z, x
+    beq @next_player
+    lda plane_speed, x
+    beq @stalling
     lda joysticks,x
     eor #$1f
     and #$0c                ; 4 = left; 8 = right
-    beq @straight_ahead     ; direction did not change
+    beq @check_vertical_direction     ; horizontal direction did not change
 ; change direction
     and #$08
     beq @turn_left
@@ -22,10 +25,110 @@ players_move:
 @change_direction:
     clc
     adc plane_direction,x
-    jsr set_plane_direction
+    jsr set_plane_horizontal_direction
     ldy player_sprite_offset
 
-@straight_ahead:
+@check_vertical_direction:
+    lda joysticks, x
+    and #$03
+    eor #$03
+    beq @halve_vertical_direction
+    and #$02
+    beq @turn_down
+    lda plane_z, x
+    cmp #$61
+    bmi @turn_up
+    cmp #$7e
+    bmi @turn_up_slow
+ ; stall
+    lda #$00
+    sta plane_speed, x
+    lda #$80
+    jmp @set_vertical_direction
+@turn_up_slow:
+    and #$1f
+    eor #$1f
+    lsr
+    jmp @set_vertical_direction
+@turn_up:
+    lda #$40
+    jmp @set_vertical_direction
+@turn_down:
+    lda #$c0
+    jmp @set_vertical_direction
+
+@stalling:
+    lda joysticks, x
+    eor #$1f
+    and #$01
+    beq @move_ahead ; keep stalling unless turning joystick up = nose down
+    lda joysticks, x
+    eor #$1f
+    and #$0c
+    beq @move_ahead ; keep stalling unless turning to side
+    lda #$08
+    sta plane_speed, x
+
+@halve_vertical_direction:
+    lda plane_dz, x
+    bmi @halve_vertical_direction_down
+    lsr
+    jmp @set_vertical_direction
+@halve_vertical_direction_down:
+    sec
+    ror
+
+@set_vertical_direction:
+    sta plane_dz, x
+
+@move_ahead:
+    jsr move_plane_ahead
+
+@next_player:
+    dey
+    dey
+    dex
+    bmi @players_moved
+    jmp @each_player
+
+@players_moved:
+    lda screen_drawing_round_counter
+    and #$01
+    tax
+    ldy #$06
+    jsr place_shadow
+    lda screen_drawing_round_counter
+    and #$01
+    ora #$02
+    tax
+    ldy #$07
+    jmp place_shadow
+
+place_shadow: ; x = plane number 0-3; y = shadow sprite number 4-7
+    lda sprite_pointers, x ; shape
+    sta sprite_pointers, y
+    lda plane_x_hi_bit, x
+    bne @shadow_right
+    lda bit_by_index, y
+    eor #$ff
+    and $d010
+    sta $d010
+    jmp @set_shadow_position
+@shadow_right:
+    lda bit_by_index, y
+    ora $d010
+    sta $d010
+@set_shadow_position:
+    tya
+    asl
+    tay
+    lda plane_x_lo, x
+    sta $d000, y
+    lda plane_y, x
+    sta $d001, y
+    RTS
+
+move_plane_ahead: ; x = plane number 0-3
     clc
     lda plane_dx, x
     bmi @decrease_x
@@ -76,64 +179,54 @@ players_move:
     sta plane_y_fragment, x
     bcc @y_done
     inc plane_y, x
-    lda plane_y, x
-    sta $d001, y
-    jmp @y_done
+    jmp @set_y_position
 
 @decrease_y:
     adc plane_y_fragment, x
     sta plane_y_fragment, x
     bcs @y_done
     dec plane_y, x
-    lda plane_y, x
+@set_y_position:
+    lda plane_z, x
+    lsr
+    lsr
+    lsr
+    eor #$ff
+    clc
+    adc plane_y, x
     sta $d001, y
 
 @y_done:
-    dey
-    dey
-    dex
-    bmi @players_moved
-    jmp @each_player
+    lda plane_dz, x
+    bmi @decrease_z
+    clc
+    adc plane_z_fragment, x
+    sta plane_z_fragment, x
+    bcc @end_move
+    inc plane_z, x
+    dec plane_speed, x
+    bpl @end_move
+    inc plane_speed, x
+    lda #$ff
+    sta plane_dz, x
 
-@players_moved:
-    lda screen_drawing_round_counter
-    and #$01
-    tax
-    ldy #$06
-    jsr place_shadow
-    lda screen_drawing_round_counter
-    and #$01
-    ora #$02
-    tax
-    ldy #$07
-    jmp place_shadow
-
-place_shadow: ; x = plane number 0-3; y = shadow sprite number 4-7
-    lda sprite_pointers, x ; shape
-    sta sprite_pointers, y
-    lda plane_x_hi_bit, x
-    bne @shadow_right
-    lda bit_by_index, y
-    eor #$ff
-    and $d010
-    sta $d010
-    jmp @set_shadow_position
-@shadow_right:
-    lda bit_by_index, y
-    ora $d010
-    sta $d010
-@set_shadow_position:
-    tya
-    asl
-    tay
-    lda plane_x_lo, x
-    sta $d000, y
-    lda plane_y, x
-    adc #$08
-    sta $d001, y
     RTS
 
-set_plane_direction: ; x = plane number 0-3; a = new direction 0 (North) - FF (1 degree West of North)
+@decrease_z:
+    clc
+    adc plane_z_fragment, x
+    sta plane_z_fragment, x
+    bcs @end_move
+    dec plane_z, x
+    inc plane_speed, x
+    bne @end_move
+    dec plane_speed, x
+
+@end_move:
+    RTS
+
+set_plane_direction: ; initialization for now
+set_plane_horizontal_direction: ; x = plane number 0-3; a = new direction 0 (North) - FF (1 degree West of North)
     sta plane_direction,x
 ; set plane and shadow sprites point to correct direction
     tay
