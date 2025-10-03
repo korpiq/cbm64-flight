@@ -207,7 +207,7 @@ move_plane_ahead: ; x = plane number 0-3
     dec plane_speed, x
     bpl @end_move
     inc plane_speed, x
-    lda #$ff
+    lda #$80
     sta plane_dz, x
 
     RTS
@@ -219,7 +219,7 @@ move_plane_ahead: ; x = plane number 0-3
     bcs @end_move
     dec plane_z, x
     inc plane_speed, x
-    bne @end_move
+    bmi @end_move
     dec plane_speed, x
 
 @end_move:
