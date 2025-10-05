@@ -1,4 +1,4 @@
-
+name_0: .byte "joystick", 0
 name_1: .byte "speed", 0
 name_2: .byte "direction", 0
 name_3: .byte "dx", 0
@@ -13,7 +13,7 @@ name_b: .byte "y position", 0
 name_c: .byte "z position", 0
 
 debug_names_lo:
-.byte <name_1,<name_2,<name_3,<name_4,<name_5,<name_6,<name_7,<name_8,<name_9,<name_a,<name_b,<name_c
+.byte <name_0,<name_1,<name_2,<name_3,<name_4,<name_5,<name_6,<name_7,<name_8,<name_9,<name_a,<name_b,<name_c
 
 debug_names_hi:
-.byte >name_1,>name_2,>name_3,>name_4,>name_5,>name_6,>name_7,>name_8,>name_9,>name_a,>name_b,>name_c
+.byte >name_0,>name_1,>name_2,>name_3,>name_4,>name_5,>name_6,>name_7,>name_8,>name_9,>name_a,>name_b,>name_c

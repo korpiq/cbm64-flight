@@ -2,23 +2,32 @@
 start_plane_sounds:
     lda #$0f
     sta $d418
-    lda #$4a
+    lda #$bb
     sta $d405 ; Attack&Decay
-    lda #$44
+    lda #$fb
     sta $d406 ; Sustain&Release
     lda #$10
     sta $d401
-    lda #$81
-    sta $d404 ; turn on the noise
     rts
 
 update_plane_sounds:
     ldx #$03
-    lda #$10
+    lda #0
 @loop:
-    adc joysticks, x
-    asl
+    eor joysticks, x
     dex
     bpl @loop
+    sta sound_buffer
+    cmp #0
+    bne @play_sound
+    lda #$80
+    sta $d404 ; turn off the noise
+    rts
+
+@play_sound:
+    adc #$40
+    sta sound_buffer
     sta $d401
+    lda #$81
+    sta $d404 ; turn on the noise
     rts

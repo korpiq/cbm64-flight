@@ -44,22 +44,22 @@ debug_loop:
 @print_4_hex_row:
     lda #$9a             ; light blue
     jsr $ffd2
-    lda plane_speed, x
+    lda joysticks, x
     jsr print_hex
     inx
     lda #$96             ; pink
     jsr $ffd2
-    lda plane_speed, x
+    lda joysticks, x
     jsr print_hex
     inx
     lda #$99             ; light green
     jsr $ffd2
-    lda plane_speed, x
+    lda joysticks, x
     jsr print_hex
     inx
     lda #$9e             ; yellow
     jsr $ffd2
-    lda plane_speed, x
+    lda joysticks, x
     jsr print_hex
     inx
 
@@ -84,8 +84,10 @@ debug_loop:
     pla ; restore x after printing
     tax
 
-    cpy #$0c
+    cpy #$0d
     bne @print_4_hex_row
+    lda sound_buffer
+    jsr print_hex
 @wait_for_next_screen_draw:
     lda $d012
     bne @wait_for_next_screen_draw

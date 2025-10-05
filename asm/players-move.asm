@@ -266,7 +266,6 @@ set_plane_horizontal_direction: ; x = plane number 0-3; a = new direction 0 (Nor
     tya
 
 ; update dx and dy according to new direction
-; (not accommodating speed just yet)
     cmp #$80
     bcs @west; 0-$7f = "East"
     cmp #$40
