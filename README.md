@@ -27,3 +27,11 @@ Requires
 - machine code instructions: https://www.masswerk.at/6502/6502_instruction_set.html
 - 6502 operation: http://www.6502.org/users/obelisk/6502/
 
+## multiplication
+
+## unsigned 8bit x 8bit
+  - max 66 cycles with 1k of lookup table data: https://www.txbobsc.com/aal/1986/aal8603.html (scroll to "Fastest 6502 Multiplication Yet")
+  - max 120 cycles in 70 bytes of code only: https://www.nesdev.org/wiki/8-bit_Multiply#tepples_unrolled
+
+## signed -64..64
+  - -64..64 => -4096..4096, 256B lookup table data: https://www.nesdev.org/wiki/Fast_signed_multiply
