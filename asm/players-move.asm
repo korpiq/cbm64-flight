@@ -32,8 +32,9 @@ players_move:
 
 @move_player:
     lda plane_speed, x
+    sec
     cmp #$10
-    bmi @stalling
+    bcc @stalling
     lda joysticks,x
     eor #$1f
     and #$0c                          ; 4 = left; 8 = right
@@ -80,6 +81,9 @@ players_move:
     jmp @set_vertical_direction
 
 @stalling:
+    lda plane_direction, x
+    adc #$02
+    sta plane_direction, x
     lda joysticks, x
     eor #$1f
     and #$01
@@ -88,7 +92,7 @@ players_move:
     eor #$1f
     and #$0c
     beq @move_ahead ; keep stalling unless turning to side
-    lda #$40
+    lda #$80
     sta plane_speed, x
 
 @halve_vertical_direction:
