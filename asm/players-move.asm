@@ -8,18 +8,9 @@ players_move:
 @each_player:
     sty player_sprite_offset
     lda plane_z, x
-    bne :+
-    jmp @next_player
-:
+    beq @next_player
     lda plane_speed, x
     beq @stalling
-    lda joysticks, X
-    and #$10
-    bne :+
-    inc plane_speed, x
-    bne :+
-    dec plane_speed, x
-:
     lda joysticks,x
     eor #$1f
     and #$0c                ; 4 = left; 8 = right
@@ -144,11 +135,8 @@ move_plane_ahead: ; x = plane number 0-3
 ; increase x
     adc plane_x_fragment, x
     sta plane_x_fragment, x
-    cmp plane_speed, x
-    bpl @x_done
+    bcc @x_done
 ; move sprite right
-    lda #$00
-    sta plane_x_fragment, x
     lda plane_x_lo, x
     clc
     adc #$01
@@ -167,11 +155,8 @@ move_plane_ahead: ; x = plane number 0-3
 @decrease_x:
     adc plane_x_fragment, x
     sta plane_x_fragment, x
-    cmp plane_speed, x
-    bmi @x_done
+    bcs @x_done ; adding to two's complement sets carry unless sum is negative
 ; move sprite
-    lda #$00
-    sta plane_x_fragment, x
     lda plane_x_lo, x
     sec
     sbc #$01
@@ -192,20 +177,14 @@ move_plane_ahead: ; x = plane number 0-3
 ; increase y
     adc plane_y_fragment, x
     sta plane_y_fragment, x
-    cmp plane_speed, x
-    bpl @y_done
-    lda #$00
-    sta plane_y_fragment, x
+    bcc @y_done
     inc plane_y, x
     jmp @set_y_position
 
 @decrease_y:
     adc plane_y_fragment, x
     sta plane_y_fragment, x
-    cmp plane_speed, x
-    bmi @y_done
-    lda #$00
-    sta plane_y_fragment, x
+    bcs @y_done
     dec plane_y, x
 @set_y_position:
     lda plane_z, x
@@ -223,10 +202,7 @@ move_plane_ahead: ; x = plane number 0-3
     clc
     adc plane_z_fragment, x
     sta plane_z_fragment, x
-    cmp plane_speed, x
-    bpl @end_move
-    lda #$00
-    sta plane_z_fragment, x
+    bcc @end_move
     inc plane_z, x
     dec plane_speed, x
     bpl @end_move
@@ -240,10 +216,7 @@ move_plane_ahead: ; x = plane number 0-3
     clc
     adc plane_z_fragment, x
     sta plane_z_fragment, x
-    cmp plane_speed, x
-    bmi @end_move
-    lda #$00
-    sta plane_z_fragment, x
+    bcs @end_move
     dec plane_z, x
     inc plane_speed, x
     bmi @end_move
