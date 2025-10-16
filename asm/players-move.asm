@@ -8,12 +8,34 @@ players_move:
 @each_player:
     sty player_sprite_offset
     lda plane_z, x
-    beq @next_player
+    bne @move_player
+
+@next_player:
+    dey
+    dey
+    dex
+    bmi @players_moved
+    jmp @each_player
+
+@players_moved:
+    lda screen_drawing_round_counter
+    and #$01
+    tax
+    ldy #$06
+    jsr place_shadow
+    lda screen_drawing_round_counter
+    and #$01
+    ora #$02
+    tax
+    ldy #$07
+    jmp place_shadow
+
+@move_player:
     lda plane_speed, x
     beq @stalling
     lda joysticks,x
     eor #$1f
-    and #$0c                ; 4 = left; 8 = right
+    and #$0c                          ; 4 = left; 8 = right
     beq @check_vertical_direction     ; horizontal direction did not change
 ; change direction
     and #$08
@@ -24,9 +46,8 @@ players_move:
     lda #$fe
 @change_direction:
     clc
-    adc plane_direction,x
-    jsr set_plane_horizontal_direction
-    ldy player_sprite_offset
+    adc plane_direction, x ; ok to roll around from ff (north-northwest) to 0 (north)
+    sta plane_direction, x
 
 @check_vertical_direction:
     lda joysticks, x
@@ -66,7 +87,7 @@ players_move:
     eor #$1f
     and #$0c
     beq @move_ahead ; keep stalling unless turning to side
-    lda #$08
+    lda #$40
     sta plane_speed, x
 
 @halve_vertical_direction:
@@ -82,27 +103,10 @@ players_move:
     sta plane_dz, x
 
 @move_ahead:
+    jsr set_plane_horizontal_direction
     jsr move_plane_ahead
-
-@next_player:
-    dey
-    dey
-    dex
-    bmi @players_moved
-    jmp @each_player
-
-@players_moved:
-    lda screen_drawing_round_counter
-    and #$01
-    tax
-    ldy #$06
-    jsr place_shadow
-    lda screen_drawing_round_counter
-    and #$01
-    ora #$02
-    tax
-    ldy #$07
-    jmp place_shadow
+    jsr move_plane_ahead
+    jmp @next_player
 
 place_shadow: ; x = plane number 0-3; y = shadow sprite number 4-7
     lda sprite_pointers, x ; shape
@@ -128,7 +132,7 @@ place_shadow: ; x = plane number 0-3; y = shadow sprite number 4-7
     sta $d001, y
     RTS
 
-move_plane_ahead: ; x = plane number 0-3
+move_plane_ahead: ; x = plane number 0-3, y = plane sprite offset
     clc
     lda plane_dx, x
     bmi @decrease_x
@@ -199,6 +203,7 @@ move_plane_ahead: ; x = plane number 0-3
 @y_done:
     lda plane_dz, x
     bmi @decrease_z
+; increase z
     clc
     adc plane_z_fragment, x
     sta plane_z_fragment, x
@@ -219,15 +224,18 @@ move_plane_ahead: ; x = plane number 0-3
     bcs @end_move
     dec plane_z, x
     inc plane_speed, x
-    bmi @end_move
+    bne @end_move
     dec plane_speed, x
 
 @end_move:
     RTS
 
 set_plane_direction: ; initialization for now
-set_plane_horizontal_direction: ; x = plane number 0-3; a = new direction 0 (North) - FF (1 degree West of North)
-    sta plane_direction,x
+set_plane_horizontal_direction: ; x = plane number 0-3; A, Y preserved
+    pha
+    tya
+    pha
+    lda plane_direction, x
 ; set plane and shadow sprites point to correct direction
     tay
     lsr
@@ -244,59 +252,91 @@ set_plane_horizontal_direction: ; x = plane number 0-3; a = new direction 0 (Nor
     cmp #$40
     bcs @south_east; 0-3f = "NorthEast"
 ; "NorthEast"
-    tay
+    pha
     lda coordinate_of_angle, y
-    sta plane_dx, x
+    ldy plane_speed, x
+    jsr multiply_a8_y8_to_ay
     tya
+    sta plane_dx, x
+    pla
     eor #$3f ; index of coordinate of opposite angle
     tay
     lda coordinate_of_angle, y
+    ldy plane_speed, x
+    jsr multiply_a8_y8_to_ay
+    tya
     eor #$ff ; negative: go north
     adc #$01 ; range 0..-127 instead of 0..-128
     sta plane_dy, x
-    RTS
+    jmp @done
 
 @south_east: ; 40-7f
     and #$3f
+    pha
     tay
     lda coordinate_of_angle, y
-    sta plane_dy, x
+    ldy plane_speed, x
+    jsr multiply_a8_y8_to_ay
     tya
+    sta plane_dy, x
+    pla
     eor #$3f ; index of coordinate of opposite angle
     tay
     lda coordinate_of_angle, y
+    ldy plane_speed, x
+    jsr multiply_a8_y8_to_ay
+    tya
     sta plane_dx, x
-    RTS
+    jmp @done
 
 @west:
     cmp #$c0
     bcs @north_west
 ; 80-9f = "SouthWest"
     and #$3f
+    pha
     tay
     lda coordinate_of_angle, y
+    ldy plane_speed, x
+    jsr multiply_a8_y8_to_ay
+    tya
     eor #$ff ; negative: go west
     adc #$01 ; range 0..-127 instead of 0..-128
     sta plane_dx, x
-    tya
+    pla
     eor #$3f ; index of coordinate of opposite angle
     tay
     lda coordinate_of_angle, y
+    ldy plane_speed, x
+    jsr multiply_a8_y8_to_ay
+    tya
     sta plane_dy, x
-    RTS
+    jmp @done
 
 @north_west: ; a0-ff
     and #$3f
+    pha
     tay
     lda coordinate_of_angle, y
+    ldy plane_speed, x
+    jsr multiply_a8_y8_to_ay
+    tya
     eor #$ff ; negative: go north
     adc #$01 ; range 0..-127 instead of 0..-128
     sta plane_dy, x
-    tya
+    pla
     eor #$3f ; index of coordinate of opposite angle
     tay
     lda coordinate_of_angle, y
+    ldy plane_speed, x
+    jsr multiply_a8_y8_to_ay
+    tya
     eor #$ff ; negative: go west
     adc #$01 ; range 0..-127 instead of 0..-128
     sta plane_dx, x
+
+@done:
+    pla
+    tay
+    pla
     RTS

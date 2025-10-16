@@ -1,9 +1,9 @@
 
 
-plane_speed:
-    .byte 8,8,8,8
+plane_speed: ; unsigned
+    .byte $80,$80,$80,$80
 
-plane_direction:
+plane_direction: ; clockwise 256 "degree" compass direction
     .byte $e0,$20,$a0,$60
 
 plane_dx:
