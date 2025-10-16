@@ -7,6 +7,8 @@
 screen_drawing_round_counter = $02
 player_sprite_offset = $03
 sound_buffer = $04
+multiplication_lo = $05
+multiplication_factor = $06
 
 *=$0801
 .word * ; first two bytes of a PRG file: starting memory address to load rest of the file at
@@ -143,6 +145,7 @@ joys_irq:
 .include "plane-sprites.asm"
 .include "print.asm"
 .include "sound/all.asm"
+.include "math/multiply.asm"
 
 .include "data/all.asm"
 .bss
