@@ -32,7 +32,8 @@ players_move:
 
 @move_player:
     lda plane_speed, x
-    beq @stalling
+    cmp #$10
+    bmi @stalling
     lda joysticks,x
     eor #$1f
     and #$0c                          ; 4 = left; 8 = right
@@ -210,8 +211,7 @@ move_plane_ahead: ; x = plane number 0-3, y = plane sprite offset
     bcc @end_move
     inc plane_z, x
     dec plane_speed, x
-    bpl @end_move
-    inc plane_speed, x
+    bne @end_move ; starts stalling
     lda #$80
     sta plane_dz, x
 
