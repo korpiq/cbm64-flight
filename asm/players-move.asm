@@ -6,7 +6,6 @@ players_move:
     ldy #$06
 
 @each_player:
-    sty player_sprite_offset
     lda plane_z, x
     bne @move_player
 
@@ -214,8 +213,11 @@ move_plane_ahead: ; x = plane number 0-3, y = plane sprite offset
     sta plane_z_fragment, x
     bcc @end_move
     inc plane_z, x
-    dec plane_speed, x
-    bne @end_move ; starts stalling
+    dec plane_speed, x ; climbing slows us down
+    lda plane_speed, x
+    cmp #$10
+    bcs @end_move ; not stalling
+; starts stalling
     lda #$80
     sta plane_dz, x
 
@@ -227,7 +229,10 @@ move_plane_ahead: ; x = plane number 0-3, y = plane sprite offset
     sta plane_z_fragment, x
     bcs @end_move
     dec plane_z, x
-    inc plane_speed, x
+    lda plane_speed, x
+    cmp #$10
+    bcc @end_move   ; speed does not increase while stalling
+    inc plane_speed, x ; descent speeds us up
     bne @end_move
     dec plane_speed, x
 
