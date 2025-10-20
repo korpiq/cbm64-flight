@@ -170,7 +170,7 @@ move_plane_ahead: ; x = plane number 0-3, y = plane sprite offset
     sbc #$01
     sta plane_x_lo, x
     sta $d000, y
-    bcs @x_done
+    bcs @set_y_position
     lda plane_x_hi_bit, x
     eor #$01
     sta plane_x_hi_bit, x
@@ -185,22 +185,23 @@ move_plane_ahead: ; x = plane number 0-3, y = plane sprite offset
 ; increase y
     adc plane_y_fragment, x
     sta plane_y_fragment, x
-    bcc @y_done
+    bcc @set_y_position
     inc plane_y, x
     jmp @set_y_position
 
 @decrease_y:
     adc plane_y_fragment, x
     sta plane_y_fragment, x
-    bcs @y_done
+    bcs @set_y_position
     dec plane_y, x
-@set_y_position:
+@set_y_position:    ; always update y position, because height might have changed
     lda plane_z, x
     lsr
     lsr
     lsr
     eor #$ff
     clc
+    adc #1
     adc plane_y, x
     sta $d001, y
 
