@@ -4,12 +4,19 @@
 .export start
 
 ; zeropage resources
-screen_drawing_round_counter = $02
-player_sprite_offset = $03
-sound_buffer = $04
-multiplication_lo = $05
-multiplication_factor = $06
+screen_drawing_round_counter = 2
+player_sprite_offset = $2a
+sound_buffer = $52
+multiplication_lo = 3
+multiplication_factor = 4
+joysticks = $FB
+joystick_switch_bit = 5
 
+; memory addresses
+joystick_pressing_ticks = $02D7 ; each joystick 0-3 switch 0-4 for total of 20 tick counters nonzero growing up to $ff while being pressed
+joystick_last_pressed_ticks = $02EB ; each joystick 0-3 switch 0-4 last pressing_ticks count after released (reader should clear)
+
+; program file
 *=$0801
 .word * ; first two bytes of a PRG file: starting memory address to load rest of the file at
 *=$0801

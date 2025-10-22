@@ -10,6 +10,15 @@ joys_init:
     STA $DD03 ; CIA2 PortB Bit7 as OUT
     LDA $DD01 ; force Clock-Stretching (SuperCPU)
     STA $DD01 ; and release Port
+; clear joystick tick counters
+    lda #0
+    ldy #20
+:
+    sta joystick_pressing_ticks, y
+    sta joystick_last_pressed_ticks, y
+    dey
+    bpl :-
+
     RTS
 
 joys_read:
@@ -44,4 +53,42 @@ joys_read:
     ORA joysticks+$03
     STA joysticks+$03
 
-    RTS
+;    RTS
+
+;joys_update_tick_counters:
+
+    ldy #3 ; number of joystick
+    ldx #20 ; runs down to 0; offset of tick counters
+
+@read_next_joystick:
+    lda #$10
+    sta joystick_switch_bit ; bit rolls down from $10 to 1 to check each switch separately
+
+@read_next_switch_bit:
+    lda joysticks, y
+    and joystick_switch_bit
+    bne @switch_not_pressed ; switch bit is on in joystick so the switch is not being pressed
+
+; switch is pressed
+    inc joystick_pressing_ticks, x ; count ticks the switch has been pressed; nonzero = currently pressed
+    bne @end_reading_switch
+    dec joystick_pressing_ticks, x ; max out at $ff to keep counter nonzero
+    bne @end_reading_switch
+
+@switch_not_pressed:
+    lda joystick_pressing_ticks, x
+    beq @end_reading_switch
+
+; switch counter is nonzero, so it has just been released; save value to last pressed and clear counter.
+    sta joystick_last_pressed_ticks, x
+    lda #0
+    sta joystick_pressing_ticks, x ; set counter to zero as the switch is no longer being pressed.
+
+@end_reading_switch:
+    dex
+    lsr joystick_switch_bit
+    bne @read_next_switch_bit
+    dey
+    bpl @read_next_joystick
+
+    rts
