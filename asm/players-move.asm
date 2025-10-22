@@ -34,7 +34,7 @@ players_move:
     sec
     cmp #$10
     bcc @stalling
-    lda joysticks,x
+    lda joysticks, x
     eor #$1f
     and #$0c                          ; 4 = left; 8 = right
     beq @check_vertical_direction     ; horizontal direction did not change
@@ -54,15 +54,16 @@ players_move:
     lda joysticks, x
     and #$03
     eor #$03
-    beq @halve_vertical_direction
+    beq @halve_vertical_direction ; stick in the middle, so straighten up
     and #$02
     beq @turn_down
+; turn up fast until slowing down higher up "in thin athmosphere" to avoid hitting "roof" abruptly
     lda plane_z, x
     cmp #$61
-    bmi @turn_up
+    bmi @turn_up_fast
     cmp #$7e
     bmi @turn_up_slow
- ; stall
+ ; "hit roof" – stall "because of going too high"
     lda #$00
     sta plane_speed, x
     lda #$80
@@ -72,7 +73,7 @@ players_move:
     eor #$1f
     lsr
     jmp @set_vertical_direction
-@turn_up:
+@turn_up_fast:
     lda #$40
     jmp @set_vertical_direction
 @turn_down:
@@ -81,7 +82,7 @@ players_move:
 
 @stalling:
     lda plane_direction, x
-    adc #$02
+    adc #$04
     sta plane_direction, x
     lda joysticks, x
     eor #$1f
