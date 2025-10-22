@@ -13,11 +13,11 @@ multiplication_factor = $06
 *=$0801
 .word * ; first two bytes of a PRG file: starting memory address to load rest of the file at
 *=$0801
-.byte 11, 8, 221, 49, 158, 50, 48, 54, 49, 0, 0, 0 ; SYS2061
-*=2061
+.byte 18, 8, 221, 49, 158, 50, 48, 54, 56, 43, 75, 79, 82, 80, 73, 81, 0, 0, 0 ; 12765 SYS2061+KORPIQ
+*=2068
 start:
-    jsr planes_init
     jsr joys_init
+    jsr planes_init
     jsr sound_init
     jsr start_plane_sounds
     sei ; avoid blinking caused by interrupts
