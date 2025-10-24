@@ -55,32 +55,32 @@ start:
     LDA #%00000001       ; enable raster interrupt signals from VIC
     STA $D01A
     cli
-    lda #$93             ; home
+    lda #$93             ; clear screen
     jsr $ffd2
 debug_loop:
     lda #$13             ; home
     jsr $ffd2
     ldx #$00
-    ldy #$00
+    ldy #$01
 @print_4_hex_row:
     lda #$9a             ; light blue
     jsr $ffd2
-    lda joysticks, x
+    lda debug_data, x
     jsr print_hex
     inx
     lda #$96             ; pink
     jsr $ffd2
-    lda joysticks, x
+    lda debug_data, x
     jsr print_hex
     inx
     lda #$99             ; light green
     jsr $ffd2
-    lda joysticks, x
+    lda debug_data, x
     jsr print_hex
     inx
     lda #$9e             ; yellow
     jsr $ffd2
-    lda joysticks, x
+    lda debug_data, x
     jsr print_hex
     inx
 
@@ -109,12 +109,10 @@ debug_loop:
     bne @print_4_hex_row
     lda sound_buffer
     jsr print_hex
+    lda screen_drawing_round_counter
 @wait_for_next_screen_draw:
-    lda $d012
-    bne @wait_for_next_screen_draw
-    lda $d011
-    and #$80
-    bne @wait_for_next_screen_draw
+    cmp screen_drawing_round_counter
+    beq @wait_for_next_screen_draw
     jmp debug_loop
     rts
 

@@ -1,5 +1,6 @@
 
 
+debug_data:
 plane_speed: ; unsigned
     .byte $80,$80,$80,$80
 
