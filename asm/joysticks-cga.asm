@@ -60,7 +60,7 @@ joys_read:
 
     lda #$10
     sta joystick_switch_bit ; bit rolls down from $10 to 1 to check each switch separately
-    ldx #20 ; runs down to 0; offset of tick counters: 5 switches of 4 joysticks
+    ldx #19 ; runs down to 0; offset of tick counters: 5 switches of 4 joysticks
 
 @read_next_switch_bit:
     ldy #3 ; number of joystick

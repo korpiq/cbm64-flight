@@ -12,22 +12,6 @@ multiplication_factor = 4
 joysticks = $FB
 joystick_switch_bit = 5
 
-; memory addresses
-joystick_pressing_ticks = $02D7 ; each joystick 0-3 switch 0-4 for total of 20 tick counters nonzero growing up to $ff while being pressed
-joystick_last_pressed_ticks = $02EB ; each joystick 0-3 switch 0-4 last pressing_ticks count after released (reader should clear)
-
-joystick_pressing_ticks_up = joystick_pressing_ticks
-joystick_pressing_ticks_down = joystick_pressing_ticks + 4
-joystick_pressing_ticks_left = joystick_pressing_ticks + 8
-joystick_pressing_ticks_right = joystick_pressing_ticks + $0c
-joystick_pressing_ticks_button = joystick_pressing_ticks + $10
-
-joystick_last_pressed_ticks_up = joystick_last_pressed_ticks
-joystick_last_pressed_ticks_down = joystick_last_pressed_ticks + 4
-joystick_last_pressed_ticks_left = joystick_last_pressed_ticks + 8
-joystick_last_pressed_ticks_right = joystick_last_pressed_ticks + $0c
-joystick_last_pressed_ticks_button = joystick_last_pressed_ticks + $10
-
 ; program file
 *=$0801
 .word * ; first two bytes of a PRG file: starting memory address to load rest of the file at
@@ -61,7 +45,7 @@ debug_loop:
     lda #$13             ; home
     jsr $ffd2
     ldx #$00
-    ldy #$01
+    ldy #$00
 @print_4_hex_row:
     lda #$9a             ; light blue
     jsr $ffd2
@@ -105,7 +89,7 @@ debug_loop:
     pla ; restore x after printing
     tax
 
-    cpy #$0d
+    lda debug_names_hi, y ; was this the last debug line to print?
     bne @print_4_hex_row
     lda sound_buffer
     jsr print_hex
@@ -165,4 +149,5 @@ joys_irq:
 .include "math/multiply.asm"
 
 .include "data/all.asm"
+
 .bss

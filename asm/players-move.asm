@@ -37,7 +37,7 @@ players_move:
     lda joysticks, x
     eor #$1f
     and #$0c                          ; 4 = left; 8 = right
-    beq @check_vertical_direction     ; horizontal direction did not change
+    beq @check_vertical_activities    ; horizontal direction did not change
 ; change direction
     and #$08
     beq @turn_left
@@ -49,6 +49,22 @@ players_move:
     clc
     adc plane_direction, x ; ok to roll around from ff (north-northwest) to 0 (north)
     sta plane_direction, x
+
+@check_vertical_activities:
+    lda joystick_last_pressed_ticks_down, x
+    beq @check_vertical_direction
+; joystick was pressed down and released
+    pha
+    lda #0
+    sta joystick_last_pressed_ticks_down, x
+    pla
+    and #$f8
+    bne @check_vertical_direction
+; joystick was tapped down shortly
+    lda plane_speed, x
+    sbc #$04
+    sta plane_speed, x
+    jmp @move_ahead
 
 @check_vertical_direction:
     lda joysticks, x

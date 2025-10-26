@@ -1,5 +1,4 @@
 
-
 debug_data:
 plane_speed: ; unsigned
     .byte $80,$80,$80,$80
@@ -37,3 +36,28 @@ plane_y:
 plane_z:
     .byte $48,$48,$48,$48
 
+joystick_pressing_ticks:
+; 4 joystick directions + 1 button, each for each 4 players
+joystick_pressing_ticks_up:
+    .dword 0
+joystick_pressing_ticks_down:
+    .dword 0
+joystick_pressing_ticks_left:
+    .dword 0
+joystick_pressing_ticks_right:
+    .dword 0
+joystick_pressing_ticks_button:
+    .dword 0
+
+joystick_last_pressed_ticks:
+; 4 joystick directions + 1 button, each for each 4 players
+joystick_last_pressed_ticks_up:
+    .dword 0
+joystick_last_pressed_ticks_down:
+    .dword 0
+joystick_last_pressed_ticks_left:
+    .dword 0
+joystick_last_pressed_ticks_right:
+    .dword 0
+joystick_last_pressed_ticks_button:
+    .dword 0
