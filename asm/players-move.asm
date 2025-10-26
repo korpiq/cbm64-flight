@@ -35,6 +35,14 @@ players_move:
     cmp #$10
     bcc @stalling
     lda joysticks, x
+    and #$10
+    bne @check_horizontal_activities
+; button being pressed
+    inc plane_speed, x
+    bne @check_horizontal_activities
+    dec plane_speed, x
+@check_horizontal_activities:
+    lda joysticks, x
     eor #$1f
     and #$0c                          ; 4 = left; 8 = right
     beq @check_vertical_activities    ; horizontal direction did not change
