@@ -1,1 +1,1 @@
-x64 korpiq-disk.d64
+x64 build/cbm64-flight-4-players.d64

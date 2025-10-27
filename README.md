@@ -1,6 +1,7 @@
 # cbm64-flight
 
-Playable disk image: [https://kato.iki.fi/c64/flight-game-4-player.d64](https://kato.iki.fi/c64/flight-game-4-player.d64)
+- Try it out with cursor keys as joystick at [https://vc64web.github.io/#openROMS=true#port2=true#https://korpiq.github.io/cbm64/cbm64-flight-4-players.prg](https://vc64web.github.io/#openROMS=true#port2=true#https://korpiq.github.io/cbm64/cbm64-flight-4-players.prg)
+- Playable disk image: [https://korpiq.github.io/cbm64/flight-game-4-player.d64](https://korpiq.github.io/cbm64/cbm64-flight-4-players.d64)
 
 Learning to create a game where 4 players can fly their own planes on the same immobile screen.
 
