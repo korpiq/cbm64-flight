@@ -1,14 +1,15 @@
 # cbm64-flight
 
-- Try it out with cursor keys as joystick at [https://vc64web.github.io/#openROMS=true#port2=true#https://korpiq.github.io/cbm64/cbm64-flight-4-players.prg](https://vc64web.github.io/#openROMS=true#port2=true#https://korpiq.github.io/cbm64/cbm64-flight-4-players.prg)
-- Playable disk image: [https://korpiq.github.io/cbm64/flight-game-4-player.d64](https://korpiq.github.io/cbm64/cbm64-flight-4-players.d64)
-
 Learning to create a game where 4 players can fly their own planes on the same immobile screen.
 
 ![Commodore 64 screen full of debug info rows of 4 columns of hexadecimal numbers with titles on the right, 4 small airplane images on top, two of them with black shadows](https://kato.iki.fi/pic/c64-game-4-planes-wip_20251026.png)
 
 Assumes
 - common ("CGA") user port joystick expansion
+
+## Play now
+
+Game disk and web play link published at [https://korpiq.github.io/](https://korpiq.github.io/)
 
 ## build and run
 
