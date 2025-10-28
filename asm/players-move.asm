@@ -2,6 +2,8 @@
 .feature c_comments
 
 players_move:
+    lda #0
+    sta $d001 + 2 * 4
     ldx #$03
     ldy #$06
 
@@ -38,6 +40,11 @@ players_move:
     and #$10
     bne @check_horizontal_activities
 ; button being pressed
+    txa
+    and screen_drawing_round_counter
+    bne @speed_up
+    jsr animate_exhaust
+@speed_up:
     inc plane_speed, x
     bne @check_horizontal_activities
     dec plane_speed, x
@@ -375,3 +382,86 @@ set_plane_horizontal_direction: ; x = plane number 0-3; A, Y preserved
     tay
     pla
     RTS
+
+animate_exhaust:
+    lda plane_x_hi_bit, x
+    sta exhaust_x_hi
+    lda plane_dx, x
+    bpl @x_positive
+    lsr
+    lsr
+    lsr
+    lsr
+    eor #$f0
+    bmi @add_x
+@x_positive:
+    lsr
+    lsr
+    lsr
+    lsr
+    eor #$0f
+@add_x:
+    clc
+    adc plane_x_lo, x
+    bcc @same_side
+    pha
+    lda plane_x_hi_bit, x
+    eor exhaust_x_hi
+;    sta exhaust_x_hi0
+    pla
+@same_side:
+    sta $d000 + 2 * 4
+    lda exhaust_x_hi
+    bne @right_side
+    lda $d010
+    and #$ef
+    sta $d010
+    bne @y
+@right_side:
+    lda $d010
+    ora #$10
+    sta $d010
+@y:
+    lda plane_dy, x
+    bpl @y_positive
+    lsr
+    lsr
+    lsr
+    lsr
+    eor #$f0
+    bmi @add_y
+@y_positive:
+    lsr
+    lsr
+    lsr
+    lsr
+    eor #$0f
+@add_y:
+    clc
+    adc $d001, y
+    sta $d001 + 2 * 4
+; color
+    txa
+    pha
+    ora screen_drawing_round_counter
+    and #$03
+    tax
+    lda fire_colors, x
+    sta $d02b
+    pla
+    tax
+    
+; sprite ball shape
+    txa
+    adc screen_drawing_round_counter
+    and #3
+    clc
+    adc #$90
+    sta sprite_pointers + 4
+
+    RTS
+
+fire_colors:
+    .byte 2, 1, 7, 10
+exhaust_x_hi:
+    .byte 0

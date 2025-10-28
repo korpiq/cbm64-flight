@@ -13,13 +13,17 @@ planes_init:
     ldx #$00
 @sprite_shapes_loop: ; sprites must begin at $40 boundary
     lda plane_sprites, x
-    sta planes_shapes_data, x
+    sta sprites_data, x
     lda plane_sprites + $0100, x
-    sta planes_shapes_data + $0100, x
+    sta sprites_data + $0100, x
     lda plane_sprites + $0200, x
-    sta planes_shapes_data + $0200, x
+    sta sprites_data + $0200, x
     lda plane_sprites + $0300, x
-    sta planes_shapes_data + $0300, x
+    sta sprites_data + $0300, x
+    lda ball_sprites, x
+    sta sprites_data + $0400, x
+    lda ball_sprites + $0100, x
+    sta sprites_data + $0500, x
     inx
     bne @sprite_shapes_loop
 

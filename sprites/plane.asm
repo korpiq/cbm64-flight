@@ -368,5 +368,3 @@ plane_sprites:
 	.byte $00, $00, $00
 	.byte $00, $00, $00
     .byte $00
-
-plane_sprite_number = plane_sprites / 64

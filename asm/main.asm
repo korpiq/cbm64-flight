@@ -5,7 +5,7 @@
 
 ; zeropage resources
 screen_drawing_round_counter = 2
-player_sprite_offset = $2a
+sprite_tmp = $2a
 sound_buffer = $52
 multiplication_lo = 3
 multiplication_factor = 4
@@ -149,5 +149,6 @@ joys_irq:
 .include "math/multiply.asm"
 
 .include "data/all.asm"
+.include "../sprites/all.asm"
 
 .bss
