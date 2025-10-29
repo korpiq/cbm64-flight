@@ -434,7 +434,9 @@ animate_exhaust:
 ; color
     txa
     pha
-    ora screen_drawing_round_counter
+    lda screen_drawing_round_counter
+    lsr
+    lsr
     and #$03
     tax
     lda fire_colors, x
@@ -443,8 +445,8 @@ animate_exhaust:
     tax
     
 ; sprite ball shape
-    txa
-    adc screen_drawing_round_counter
+    lda plane_x_lo, x
+    adc plane_y, x
     and #3
     clc
     adc #$90
@@ -453,4 +455,4 @@ animate_exhaust:
     RTS
 
 fire_colors:
-    .byte 2, 1, 7, 10
+    .byte 1, 2, 7, 7
