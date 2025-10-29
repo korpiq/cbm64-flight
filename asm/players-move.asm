@@ -186,7 +186,7 @@ move_plane_ahead: ; x = plane number 0-3, y = plane sprite offset
     lda plane_x_hi_bit, x
     eor #$01
     sta plane_x_hi_bit, x
-; move plane and shadow sprites right over 8 bit boundary
+; move plane right over 8 bit boundary
     lda bit_by_index, x
     eor $d010
     sta $d010
@@ -206,7 +206,7 @@ move_plane_ahead: ; x = plane number 0-3, y = plane sprite offset
     lda plane_x_hi_bit, x
     eor #$01
     sta plane_x_hi_bit, x
-; move plane and shadow sprites left over 8 bit boundary
+; move plane sprite left over 8 bit boundary
     lda bit_by_index, x
     eor $d010
     sta $d010
