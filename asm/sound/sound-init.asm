@@ -7,4 +7,6 @@ sound_init:
     inx
     cpx #$25
     bne @loop
+    lda #$0f
+    sta $d418 ; turn volume up to fefeven
     rts

@@ -41,6 +41,7 @@ start:
     cli
     lda #$93             ; clear screen
     jsr $ffd2
+    jsr sound_explosion
 debug_loop:
     lda #$13             ; home
     jsr $ffd2

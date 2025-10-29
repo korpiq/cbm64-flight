@@ -262,6 +262,9 @@ move_plane_ahead: ; x = plane number 0-3, y = plane sprite offset
     sta plane_z_fragment, x
     bcs @end_move
     dec plane_z, x
+    bne :+
+    jsr explode
+:
     lda plane_speed, x
     cmp #$10
     bcc @end_move   ; speed does not increase while stalling
@@ -454,5 +457,7 @@ animate_exhaust:
 
     RTS
 
-fire_colors:
-    .byte 7, 8, 10, 14
+explode:
+    lda #0
+    sta $D027, x
+    jmp sound_explosion

@@ -1,10 +1,8 @@
 
 start_plane_sounds:
-    lda #$0f
-    sta $d418
     lda #$bb
     sta $d405 ; Attack&Decay
-    lda #$fb
+    lda #$8b
     sta $d406 ; Sustain&Release
     lda #$10
     sta $d401

@@ -25,3 +25,6 @@ planes_init_shape_ptr: ; sprite shapes for $07f8 -
 sprite_pointers = $07f8
 
 sprites_data = $2000 ; sprite shapes copied to $40-byte boundary
+
+fire_colors:
+    .byte 7, 8, 10, 14
