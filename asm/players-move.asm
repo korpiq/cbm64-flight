@@ -8,7 +8,7 @@ players_move:
     ldy #$06
 
 @each_player:
-    lda plane_z, x
+    lda plane_alive, x
     bne @move_player
 
 @next_player:
@@ -263,7 +263,7 @@ move_plane_ahead: ; x = plane number 0-3, y = plane sprite offset
     bcs @end_move
     dec plane_z, x
     bne :+
-    jsr explode
+    jmp plane_explode
 :
     lda plane_speed, x
     cmp #$10
@@ -456,8 +456,3 @@ animate_exhaust:
     sta sprite_pointers + 4
 
     RTS
-
-explode:
-    lda #0
-    sta $D027, x
-    jmp sound_explosion

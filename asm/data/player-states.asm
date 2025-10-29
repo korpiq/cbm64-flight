@@ -1,5 +1,7 @@
 
 debug_data:
+plane_alive:
+    .byte 1,1,1,1
 plane_speed: ; unsigned
     .byte $80,$80,$80,$80
 

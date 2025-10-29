@@ -118,6 +118,7 @@ joys_irq:
     cld
     jsr joys_read
     jsr players_move
+    jsr check_deaths
     jsr update_plane_sounds
 
     inc screen_drawing_round_counter
@@ -134,6 +135,7 @@ joys_irq:
 
 .include "joysticks-cga.asm"
 .include "players-move.asm"
+.include "death.asm"
 .include "plane-sprites.asm"
 .include "print.asm"
 .include "sound/all.asm"
