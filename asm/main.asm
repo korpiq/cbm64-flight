@@ -39,6 +39,10 @@ start:
     LDA #%00000001       ; enable raster interrupt signals from VIC
     STA $D01A
     cli
+    lda #0
+    sta $d020
+    lda #6
+    sta $d021
     lda #$93             ; clear screen
     jsr $ffd2
     jsr sound_explosion
@@ -102,20 +106,13 @@ debug_loop:
     rts
 
 joys_irq:
-    ; black line where our irq is called
     lda $d020
     pha
-    ldx #$00
-    lda $d012
-@wait1:
-    cmp $d012
-    beq @wait1
-    stx $d020
-    lda $d012
-@wait2:
-    cmp $d012
-    beq @wait2
-    lda #$0f
+    lda #4
+    ldx $d012
+@wait_for_next_raster_line_1:
+    cpx $d012
+    beq @wait_for_next_raster_line_1
     sta $d020
 
     cld
@@ -125,18 +122,11 @@ joys_irq:
 
     inc screen_drawing_round_counter
 
-    ; black line where our irq is called
-    ldx #$00
-    lda $d012
-@wait3:
-    cmp $d012
-    beq @wait3
-    stx $d020
-    lda $d012
-@wait4:
-    cmp $d012
-    beq @wait4
     pla
+    ldx $d012
+@wait_for_next_raster_line_2:
+    cpx $d012
+    beq @wait_for_next_raster_line_2
     sta $d020
 
     ASL $D019            ; acknowledge the interrupt by clearing the VIC's interrupt flag
