@@ -384,39 +384,30 @@ set_plane_horizontal_direction: ; x = plane number 0-3; A, Y preserved
     RTS
 
 animate_exhaust:
-    lda plane_x_hi_bit, x
-    sta exhaust_x_hi
     lda plane_dx, x
     bpl @x_positive
     lsr
     lsr
     lsr
     lsr
-    eor #$f0
-    bmi @add_x
+    eor #$0f
+    bpl @add_x
 @x_positive:
     lsr
     lsr
     lsr
     lsr
-    eor #$0f
+    eor #$ff
 @add_x:
     clc
     adc plane_x_lo, x
-    bcc @same_side
-    pha
-    lda plane_x_hi_bit, x
-    eor exhaust_x_hi
-;    sta exhaust_x_hi0
-    pla
-@same_side:
     sta $d000 + 2 * 4
-    lda exhaust_x_hi
+    lda plane_x_hi_bit, x
     bne @right_side
     lda $d010
     and #$ef
     sta $d010
-    bne @y
+    jmp @y
 @right_side:
     lda $d010
     ora #$10
@@ -428,14 +419,14 @@ animate_exhaust:
     lsr
     lsr
     lsr
-    eor #$f0
-    bmi @add_y
+    eor #$0f
+    bpl @add_y
 @y_positive:
     lsr
     lsr
     lsr
     lsr
-    eor #$0f
+    eor #$ff
 @add_y:
     clc
     adc $d001, y
@@ -463,5 +454,3 @@ animate_exhaust:
 
 fire_colors:
     .byte 2, 1, 7, 10
-exhaust_x_hi:
-    .byte 0
