@@ -455,4 +455,4 @@ animate_exhaust:
     RTS
 
 fire_colors:
-    .byte 1, 2, 7, 7
+    .byte 7, 8, 10, 14
