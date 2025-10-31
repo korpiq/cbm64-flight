@@ -13,6 +13,14 @@ plane_speed_initial = $80
 plane_direction: ; clockwise 256 "degree" compass direction
     .byte $e0,$20,$a0,$60
 
+; unit vector direction before adjusted by speed
+plane_dx_unit:
+    .byte 0,0,0,0
+
+plane_dy_unit:
+    .byte 0,0,0,0
+
+; unit vectors adjusted by speed
 plane_dx:
     .byte 0,0,0,0
 

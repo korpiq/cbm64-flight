@@ -299,6 +299,7 @@ set_plane_horizontal_direction: ; x = plane number 0-3; A, Y preserved
 ; "NorthEast"
     pha
     lda coordinate_of_angle, y
+    sta plane_dx_unit, x
     ldy plane_speed, x
     jsr multiply_a8_y8_to_ay
     tya
@@ -306,6 +307,10 @@ set_plane_horizontal_direction: ; x = plane number 0-3; A, Y preserved
     pla
     eor #$3f ; index of coordinate of opposite angle
     tay
+    lda coordinate_of_angle, y
+    eor #$ff ; negative: go north
+    adc #$01 ; range 0..-127 instead of 0..-128
+    sta plane_dy_unit, x
     lda coordinate_of_angle, y
     ldy plane_speed, x
     jsr multiply_a8_y8_to_ay
@@ -320,6 +325,7 @@ set_plane_horizontal_direction: ; x = plane number 0-3; A, Y preserved
     pha
     tay
     lda coordinate_of_angle, y
+    sta plane_dy_unit, x
     ldy plane_speed, x
     jsr multiply_a8_y8_to_ay
     tya
@@ -328,6 +334,7 @@ set_plane_horizontal_direction: ; x = plane number 0-3; A, Y preserved
     eor #$3f ; index of coordinate of opposite angle
     tay
     lda coordinate_of_angle, y
+    sta plane_dx_unit, x
     ldy plane_speed, x
     jsr multiply_a8_y8_to_ay
     tya
@@ -342,6 +349,10 @@ set_plane_horizontal_direction: ; x = plane number 0-3; A, Y preserved
     pha
     tay
     lda coordinate_of_angle, y
+    eor #$ff ; negative: go west
+    adc #$01 ; range 0..-127 instead of 0..-128
+    sta plane_dx_unit, x
+    lda coordinate_of_angle, y
     ldy plane_speed, x
     jsr multiply_a8_y8_to_ay
     tya
@@ -352,6 +363,7 @@ set_plane_horizontal_direction: ; x = plane number 0-3; A, Y preserved
     eor #$3f ; index of coordinate of opposite angle
     tay
     lda coordinate_of_angle, y
+    sta plane_dy_unit, x
     ldy plane_speed, x
     jsr multiply_a8_y8_to_ay
     tya
@@ -363,6 +375,10 @@ set_plane_horizontal_direction: ; x = plane number 0-3; A, Y preserved
     pha
     tay
     lda coordinate_of_angle, y
+    eor #$ff ; negative: go north
+    adc #$01 ; range 0..-127 instead of 0..-128
+    sta plane_dy_unit, x
+    lda coordinate_of_angle, y
     ldy plane_speed, x
     jsr multiply_a8_y8_to_ay
     tya
@@ -372,6 +388,10 @@ set_plane_horizontal_direction: ; x = plane number 0-3; A, Y preserved
     pla
     eor #$3f ; index of coordinate of opposite angle
     tay
+    lda coordinate_of_angle, y
+    eor #$ff ; negative: go west
+    adc #$01 ; range 0..-127 instead of 0..-128
+    sta plane_dx_unit, x
     lda coordinate_of_angle, y
     ldy plane_speed, x
     jsr multiply_a8_y8_to_ay
@@ -387,7 +407,7 @@ set_plane_horizontal_direction: ; x = plane number 0-3; A, Y preserved
     RTS
 
 animate_exhaust:
-    lda plane_dx, x
+    lda plane_dx_unit, x
     bpl @x_positive
     lsr
     lsr
@@ -416,7 +436,7 @@ animate_exhaust:
     ora #$10
     sta $d010
 @y:
-    lda plane_dy, x
+    lda plane_dy_unit, x
     bpl @y_positive
     lsr
     lsr
