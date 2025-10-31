@@ -11,14 +11,22 @@ multiplication_lo = 3
 multiplication_factor = 4
 joysticks = $FB
 joystick_switch_bit = 5
+map_tile_pointer = 5
 
 ; program file
 *=$0801
 .word * ; first two bytes of a PRG file: starting memory address to load rest of the file at
 *=$0801
-.byte 18, 8, 221, 49, 158, 50, 48, 54, 56, 43, 75, 79, 82, 80, 73, 81, 0, 0, 0 ; 12765 SYS2061+KORPIQ
-*=2068
+.byte 11, 8, 221, 49, 158, 50, 48, 54, 49, 0, 0, 0 ; SYS2061
+*=2061
 start:
+    lda #$9b             ; grey
+    jsr $ffd2
+    lda #$93             ; clear screen
+    jsr $ffd2
+    lda #0
+    sta $d020
+    jsr map_init
     jsr joys_init
     jsr planes_init
     jsr sound_init
@@ -39,13 +47,8 @@ start:
     LDA #%00000001       ; enable raster interrupt signals from VIC
     STA $D01A
     cli
-    lda #0
-    sta $d020
-    lda #6
-    sta $d021
-    lda #$93             ; clear screen
-    jsr $ffd2
     jsr sound_explosion
+    RTS
 debug_loop:
     lda #$13             ; home
     jsr $ffd2
@@ -133,6 +136,7 @@ joys_irq:
     ASL $D019            ; acknowledge the interrupt by clearing the VIC's interrupt flag
     JMP $EA31            ; jump into KERNAL's standard interrupt service routine to handle keyboard scan, cursor display etc.
 
+.include "map.asm"
 .include "joysticks-cga.asm"
 .include "players-move.asm"
 .include "death.asm"
