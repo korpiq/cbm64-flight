@@ -1,9 +1,14 @@
 
+plane_directions_initial:
+    .byte $e0,$20,$a0,$60
+
 debug_data:
 plane_alive:
     .byte 1,1,1,1
+plane_alive_initial = 1
 plane_speed: ; unsigned
     .byte $80,$80,$80,$80
+plane_speed_initial = $80
 
 plane_direction: ; clockwise 256 "degree" compass direction
     .byte $e0,$20,$a0,$60
@@ -37,6 +42,7 @@ plane_y:
 
 plane_z:
     .byte $48,$48,$48,$48
+plane_z_initial = $48
 
 joystick_pressing_ticks:
 ; 4 joystick directions + 1 button, each for each 4 players

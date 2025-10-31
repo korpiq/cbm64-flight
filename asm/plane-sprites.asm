@@ -27,24 +27,31 @@ planes_init:
     inx
     bne @sprite_shapes_loop
 
-    ldx #$07
-@loop8: ; set for VIC-II sprite locations, colors, and shape pointers
-    lda planes_init_loc, x
-    sta $d000, x
-    lda plane_shadows_init_loc, x
-    sta $d000 + 8, x
-    lda planes_init_color, x
-    sta $d027, x
-    lda planes_init_shape_ptr, x
-    sta sprite_pointers, x
-    txa
-    pha
-    lda plane_direction, x
-    jsr set_plane_direction
-    pla
-    tax
+; initialize plane variables
+    lda #plane_alive_initial
+    ldx #3
+:
+    sta plane_alive, x
     dex
-    bpl @loop8
+    bpl :-
+    lda #plane_speed_initial
+    ldx #3
+:
+    sta plane_speed, x
+    dex
+    bpl :-
+    lda #plane_z_initial
+    ldx #3
+:
+    sta plane_z, x
+    dex
+    bpl :-
+    ldx #3
+:
+    lda plane_directions_initial, x
+    sta plane_direction, x
+    dex
+    bpl :-
 
     ldx #$03
 @loop4: ; set plane locations
@@ -62,5 +69,23 @@ planes_init:
 
     lda #$ff  ; set bits on
     sta $d015 ; enabled
+
+    ldx #$07
+@loop8: ; set for VIC-II sprite locations, colors, and shape pointers
+    lda planes_init_loc, x
+    sta $d000, x
+    lda planes_init_color, x
+    sta $d027, x
+    lda planes_init_shape_ptr, x
+    sta sprite_pointers, x
+    txa
+    pha
+    lda plane_direction, x
+    jsr set_plane_direction
+    pla
+    tax
+    dex
+    bpl @loop8
+
 
     RTS
