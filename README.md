@@ -33,6 +33,12 @@ Requires
 - machine code instructions: https://www.masswerk.at/6502/6502_instruction_set.html
 - 6502 operation: http://www.6502.org/users/obelisk/6502/
 
+### cut sprites out of SPD file
+
+```sh
+dd bs=1 skip=20 count=$[ 64 * NUMBER_OF_SPRITES ] < original.spd > sprites-only.bin
+```
+
 ## multiplication
 
 ## unsigned 8bit x 8bit

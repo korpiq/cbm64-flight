@@ -7,8 +7,13 @@ planes_init:
     sta $d010 ; x high bit
     sta $d017 ; y expansion
     sta $d01b ; behind text
-    sta $d01c ; multicolor
     sta $d01d ; x expansion
+    lda #$0f
+    sta $d01c ; multicolor
+    lda #12
+    sta $d025
+    lda #15
+    sta $d026
 
     ldx #$00
 @sprite_shapes_loop: ; sprites must begin at $40 boundary
@@ -26,7 +31,6 @@ planes_init:
     sta sprites_data + $0500, x
     inx
     bne @sprite_shapes_loop
-
 ; initialize plane variables
     lda #plane_alive_initial
     ldx #3

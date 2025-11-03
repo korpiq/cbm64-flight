@@ -287,7 +287,8 @@ set_plane_horizontal_direction: ; x = plane number 0-3; A, Y preserved
     lsr
     lsr
     lsr
-    ora #$80
+    clc
+    adc #(plane_sprite_number)
     sta sprite_pointers, x
     tya
 
@@ -472,7 +473,7 @@ animate_exhaust:
     adc plane_y, x
     and #3
     clc
-    adc #$90
+    adc #(ball_sprite_number)
     sta sprite_pointers + 4
 
     RTS

@@ -1,2 +1,4 @@
+.align $40
 .include "balls.asm"
-.include "plane.asm"
+plane_sprites:
+.incbin "plane-sprites.bin"
