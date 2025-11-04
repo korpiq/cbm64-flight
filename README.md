@@ -2,7 +2,7 @@
 
 Learning to create a game where 4 players can fly their own planes on the same immobile screen.
 
-![Commodore 64 screen full of debug info rows of 4 columns of hexadecimal numbers with titles on the right, 4 small airplane images on top, two of them with black shadows](https://kato.iki.fi/pic/c64-game-4-planes-wip_20251026.png)
+![Commodore 64 screen full of debug info rows of 4 columns of hexadecimal numbers with titles on the right, 4 small airplane images on top, two of them with black shadows](https://kato.iki.fi/pic/c64-flight-game-4-planes-wip-20251104.png)
 
 Assumes
 - common ("CGA") user port joystick expansion
