@@ -29,3 +29,5 @@ landscape_river_upright = $d0
 landscape_river_upleft = $cf
 landscape_river_downleft = $cc
 landscape_river_downright = $fa
+
+charset_map = $3000

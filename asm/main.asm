@@ -26,6 +26,7 @@ start:
     jsr $ffd2
     lda #0
     sta $d020
+    jsr chars_init
     jsr map_init
     jsr joys_init
     jsr planes_init
@@ -48,6 +49,16 @@ start:
     STA $D01A
     cli
     jsr sound_explosion
+    lda #<plane_sprites
+    jsr print_hex
+    lda #>plane_sprites
+    jsr print_hex
+    ldx #3
+:
+    lda sprite_pointers,x
+    jsr print_hex
+    dex
+    bpl :-
     RTS
 debug_loop:
     lda #$13             ; home
@@ -136,6 +147,7 @@ joys_irq:
     ASL $D019            ; acknowledge the interrupt by clearing the VIC's interrupt flag
     JMP $EA31            ; jump into KERNAL's standard interrupt service routine to handle keyboard scan, cursor display etc.
 
+.include "chars.asm"
 .include "map.asm"
 .include "joysticks-cga.asm"
 .include "players-move.asm"
@@ -146,6 +158,6 @@ joys_irq:
 .include "math/multiply.asm"
 
 .include "data/all.asm"
-.include "../sprites/all.asm"
+.include "../graphics/all.asm"
 
 .bss
