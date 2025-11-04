@@ -26,9 +26,10 @@ map_init:
     rol
     rol
     rol
-    rol
-    sec
-    sbc #$1f
+    and #$c7
+    ora #$20
+    clc
+    adc #1
     jsr fill_map_tile_at_x_y
     lda #$d4 ; from screen chars to color memory
     adc map_tile_pointer + 1
