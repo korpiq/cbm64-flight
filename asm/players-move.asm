@@ -142,6 +142,42 @@ players_move:
     jsr set_plane_horizontal_direction
     jsr move_plane_ahead
     jsr move_plane_ahead
+
+; pollute map
+    txa
+    pha
+    tya
+    pha
+    lda #$d8
+    sta map_tile_pointer + 1
+    lda plane_y, x
+    tay
+    lda plane_x_lo, x
+    pha
+    lda plane_x_hi_bit, x
+    tax
+    pla
+    jsr sprite_char_pos
+; check that it points on screen
+    lda map_tile_pointer + 1
+    cmp #$d8
+    bcc @polluted
+    cmp #$db
+    bcc :+
+    bne @polluted
+    lda map_tile_pointer
+    cmp #$e8
+    bcs @polluted
+:
+    ldx #0
+    lda #11
+    sta (map_tile_pointer,x)
+@polluted:
+    pla
+    tay
+    pla
+    tax
+
     jmp @next_player
 
 place_shadow: ; x = plane number 0-3; y = shadow sprite number 4-7
@@ -477,3 +513,45 @@ animate_exhaust:
     sta sprite_pointers + 4
 
     RTS
+
+sprite_char_pos: ;  a = x lo, x = x hi, y = y, map_tile_pointer = start of screen
+    clc
+    cpx #0
+    beq :+
+    sec
+:
+    ror
+    lsr
+    lsr
+    cpx #0
+    beq :+
+    sec
+    sbc #1
+    bne @x_added
+:
+    adc #6
+    bne @x_added
+@x_added:
+    pha
+    tya
+    lsr
+    lsr
+    lsr
+    sec
+    sbc #6
+    tay
+    pla
+    cpy #0
+    beq @all_added
+@add_row:
+    clc
+    adc #40
+    bcc :+
+    inc map_tile_pointer + 1
+:
+    dey
+    bne @add_row
+@all_added:
+    sta map_tile_pointer
+    RTS
+
