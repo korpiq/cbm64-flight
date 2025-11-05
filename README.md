@@ -2,7 +2,7 @@
 
 Learning to create a game where 4 players can fly their own planes on the same immobile screen.
 
-![Commodore 64 screen full of debug info rows of 4 columns of hexadecimal numbers with titles on the right, 4 small airplane images on top, two of them with black shadows](https://kato.iki.fi/pic/c64-flight-game-4-planes-wip-20251104.png)
+![Commodore 64 screen with a tiley elliptic "world map", 4 small airplane images on top, leaving trails of gray tiles](https://kato.iki.fi/pic/cbm64-flight4planetally-wip-20251105.png)
 
 Assumes
 - common ("CGA") user port joystick expansion
