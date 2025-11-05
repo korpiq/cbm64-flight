@@ -1,14 +1,14 @@
 
 map_row_length: ; in tiles aka double characters
-    .byte  4,  9, 14, 17
+    .byte  6,  11, 14, 17
     .byte 18, 19, 18
-    .byte 17, 14,  9,  4
+    .byte 17, 14,  11,  6
 map_row_length_end:
 
 map_row_offset: ; single character spaces
-    .byte 15, 11, 6, 3
+    .byte 14, 9, 6, 3
     .byte 2, 1, 2
-    .byte 3, 6, 11, 15
+    .byte 3, 6, 9, 14
 
 map_level_colors:
     .byte 6, 14, 13, 5, 8, 10, 12, 15
