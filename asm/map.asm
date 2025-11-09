@@ -12,6 +12,19 @@ map_init:
     ora #$40
     sta $d011
 
+; generate height for each map tile
+    lda #$80 ; prefill map with unused value to differentiate ungenerated from generated tiles
+    ldx #0
+:
+    sta map_tile_heights, x
+    inx
+    cpx #(map_tiles_total_count)
+    bne :-
+
+    ; start with random height for map center row edges
+    jsr get_random_byte
+    and #7 ;
+
 ; draw map
     ldy #(map_rows_total_count) ; how many rows in map
     dey
