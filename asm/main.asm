@@ -160,4 +160,5 @@ joys_irq:
 .include "data/all.asm"
 .include "../graphics/all.asm"
 
+bss:
 .bss

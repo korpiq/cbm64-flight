@@ -13,7 +13,7 @@ map_init:
     sta $d011
 
 ; draw map
-    ldy #(map_row_length_end - map_row_length) ; how many rows in map
+    ldy #(map_rows_total_count) ; how many rows in map
     dey
 @draw_row:
     ldx map_row_length, y
