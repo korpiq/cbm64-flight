@@ -1,4 +1,3 @@
-
 map_row_length: ; in tiles aka double characters
     .byte  6,  11, 14, 17
     .byte 18, 19, 18
@@ -10,6 +9,20 @@ map_row_offset: ; single character spaces
     .byte 2, 1, 2
     .byte 3, 6, 9, 14
 map_rows_offsets_total = * - map_row_offset
+
+map_tile_row_offsets:
+    .byte 0
+    .byte 6
+    .byte 6 + 11
+    .byte 6 + 11 + 14
+    .byte 6 + 11 + 14 + 17
+    .byte 6 + 11 + 14 + 17 + 18
+    .byte 6 + 11 + 14 + 17 + 18 + 19
+    .byte 6 + 11 + 14 + 17 + 18 + 19 + 18
+    .byte 6 + 11 + 14 + 17 + 18 + 19 + 18 + 17
+    .byte 6 + 11 + 14 + 17 + 18 + 19 + 18 + 17 + 14
+    .byte 6 + 11 + 14 + 17 + 18 + 19 + 18 + 17 + 14 + 11
+    .byte 6 + 11 + 14 + 17 + 18 + 19 + 18 + 17 + 14 + 11 + 6 ; end of table
 
 map_tiles_total_count = (6 + 11 + 14 + 17 + 18) *2 + 19
 .out .sprintf("map_tiles_total_count = %d", map_tiles_total_count)
