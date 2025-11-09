@@ -155,10 +155,15 @@ joys_irq:
 .include "plane-sprites.asm"
 .include "print.asm"
 .include "sound/all.asm"
-.include "math/multiply.asm"
+.include "math/all.asm"
 
 .include "data/all.asm"
 .include "../graphics/all.asm"
 
 bss:
 .bss
+
+; each written data area consecutively after loaded file
+map_tile_heights = bss
+
+currently_used_bss_end = bss + map_tiles_total_count ; next data area can start here

@@ -39,9 +39,6 @@ landscape_river_downright = $fa
 
 charset_map = $3000
 
-map_tile_heights = bss
-map_tile_heights_end = bss + map_tiles_total_count
-
 ; tiles available for creating map
 
 tiles_per_type = map_tiles_total_count / map_level_colors_total_count + map_level_colors_total_count
