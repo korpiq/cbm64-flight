@@ -1,5 +1,7 @@
+random_byte_address = $63
+
 get_random_byte:
     lda #1
     jsr $E09A
-    lda $63
+    lda random_byte_address
     RTS

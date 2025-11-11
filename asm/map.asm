@@ -1,29 +1,55 @@
 
 map_init:
-    lda #map_special_color
+    lda #map_background_color_blue
     sta $d021
-    lda #map_river_color
+    lda #map_background_color_green
     sta $d022
-    lda #map_cliff_color
+    lda #map_background_color_brown
     sta $d023
-    lda #map_snow_color
+    lda #map_background_color_gray
     sta $d024
+; character set at $3000
     lda $d011
     ora #$40
     sta $d011
 
 ; generate height for each map tile
-    lda #$80 ; prefill map with unused value to differentiate ungenerated from generated tiles
-    ldx #0
+    lda #>(map_tile_heights)
+    sta map_tile_pointer + 1
+    ldy #map_rows_total_count
+    dey
+@fill_tile_row:
+    lda map_tile_row_offsets, y
+    sta map_tile_pointer
+    tya
+    pha
+    lda map_row_length, y
+    tay
+    dey
+    lda #0 ; prefill map border with sea
+    sta (map_tile_pointer), y
+    lda #$8 ; prefill map with unused value to differentiate ungenerated from generated tiles
 :
-    sta map_tile_heights, x
-    inx
-    cpx #(map_tiles_total_count)
+    tya
+    pha
+    txa
+    pha
+    jsr get_random_byte ; start with random height – later only for map center row edges, rest weighed by neighbors and bags
+    pla
+    tax
+    pla
+    tay
+    lda random_byte_address
+    and #7
+    sta (map_tile_pointer), y
+    dey
     bne :-
-
-    ; start with random height for map center row edges
-    jsr get_random_byte
-    and #7 ;
+    lda #0
+    sta (map_tile_pointer), y
+    pla
+    tay
+    dey
+    bpl @fill_tile_row
 
 ; draw map
     ldy #(map_rows_total_count) ; how many rows in map
@@ -67,7 +93,7 @@ map_init:
 
 point_at_map_tile: ; a = screen address hi byte (e.g. $d8 = color map); y = tile row from top; x = tile from left
     sta map_tile_pointer + 1
-    lda map_row_offset, y
+    lda map_screen_row_offsets, y
     clc
     adc #40 ; leave one row empty at top
     bcc :+
