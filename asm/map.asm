@@ -62,7 +62,18 @@ map_init:
     pha
     txa
     pha
+    lda #$29 ; no rivers etc yet
+    jsr fill_map_tile_at_x_y
+    lda #$d4 ; from screen chars to color memory
+    clc
+    adc map_tile_pointer + 1
+    sta map_tile_pointer + 1
+    pla
+    pha
+    tax
     jsr get_tile_height_at_x_y
+    tax
+    lda map_level_colors, x
     sta swap
     pla
     tax
@@ -72,24 +83,6 @@ map_init:
     txa
     pha
     lda swap
-    asl
-    asl
-    asl
-    asl
-    asl
-    asl
-    clc
-    adc #$20
-    jsr fill_map_tile_at_x_y
-    lda #$d4 ; from screen chars to color memory
-    adc map_tile_pointer + 1
-    sta map_tile_pointer + 1
-    pla
-    pha
-    lsr
-    lsr
-    tax
-    lda map_level_colors, x
     jsr color_map_tile_pointed
     pla
     tax

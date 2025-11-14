@@ -148,6 +148,9 @@ joys_irq:
     ASL $D019            ; acknowledge the interrupt by clearing the VIC's interrupt flag
     JMP $EA31            ; jump into KERNAL's standard interrupt service routine to handle keyboard scan, cursor display etc.
 
+; include independent support files before files that depend on them
+.include "sound/all.asm"
+.include "math/all.asm"
 .include "chars.asm"
 .include "map.asm"
 .include "joysticks-cga.asm"
@@ -155,8 +158,6 @@ joys_irq:
 .include "death.asm"
 .include "plane-sprites.asm"
 .include "print.asm"
-.include "sound/all.asm"
-.include "math/all.asm"
 
 .include "data/all.asm"
 .include "../graphics/all.asm"
