@@ -62,13 +62,24 @@ map_init:
     pha
     txa
     pha
-    rol
-    rol
-    rol
-    and #$c7
-    ora #$20
+    jsr get_tile_height_at_x_y
+    sta swap
+    pla
+    tax
+    pla
+    tay
+    pha
+    txa
+    pha
+    lda swap
+    asl
+    asl
+    asl
+    asl
+    asl
+    asl
     clc
-    adc #1
+    adc #$20
     jsr fill_map_tile_at_x_y
     lda #$d4 ; from screen chars to color memory
     adc map_tile_pointer + 1
@@ -157,3 +168,12 @@ fill_map_tile_pointed: ; a = color; address at map_tile_pointer
     sta (5), y
 
     RTS
+
+get_tile_height_at_x_y: ; y = tile row #; a = tile # on row from left => a = height; y its offset
+    clc
+    adc map_tile_row_offsets, y
+    tay
+    lda map_tile_heights, y
+
+    RTS
+

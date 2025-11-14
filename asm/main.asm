@@ -7,6 +7,7 @@
 screen_drawing_round_counter = 2
 sprite_tmp = $2a
 sound_buffer = $52
+swap = 3
 multiplication_lo = 3
 multiplication_factor = 4
 joysticks = $FB
