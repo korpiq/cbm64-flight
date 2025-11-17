@@ -8,6 +8,20 @@ map_init:
     sta $d023
     lda #map_background_color_gray
     sta $d024
+    ldy #0
+:
+    lda #$29
+    sta $0400, y
+    sta $0500, y
+    sta $0600, y
+    sta $0700, y
+    lda #0
+    sta $d800, y
+    sta $d900, y
+    sta $da00, y
+    sta $db00, y
+    iny
+    bne :-
 ; character set at $3000
     lda $d011
     ora #$40
