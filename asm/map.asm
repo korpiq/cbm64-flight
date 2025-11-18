@@ -83,8 +83,12 @@ map_init:
     adc map_tile_pointer + 1
     sta map_tile_pointer + 1
     pla
-    pha
     tax
+    pla
+    tay
+    pha
+    txa
+    pha
     jsr get_tile_height_at_x_y
     tax
     lda map_level_colors, x
