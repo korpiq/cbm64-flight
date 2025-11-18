@@ -51,3 +51,7 @@ dd bs=1 skip=20 count=$[ 64 * NUMBER_OF_SPRITES ] < original.spd > sprites-only.
 ## signed -64..64
 
 - -64..64 => -4096..4096, 256B lookup table data: https://www.nesdev.org/wiki/Fast_signed_multiply
+
+## random notes
+
+- at least `.incbin` seems to look into root folder before the one relative to the original file, so take care to use pretty unique filenames.
