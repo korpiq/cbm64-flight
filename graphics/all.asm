@@ -6,4 +6,4 @@ plane_sprites:
 ; .align $800 – once we load directly into correct memory area, bank#1, ~$4000
 charset_map_data:
 .incbin "charset-map.bin"
-.out .sprintf("charset_map_data = %d", charset_map_data)
+.out .sprintf("charset_map_data = %d - %d", charset_map_data, *)

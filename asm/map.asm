@@ -10,7 +10,7 @@ map_init:
     sta $d024
     ldy #0
 :
-    lda #$29
+    lda #$20
     sta $0400, y
     sta $0500, y
     sta $0600, y
@@ -76,7 +76,7 @@ map_init:
     pha
     txa
     pha
-    lda #$29 ; no rivers etc yet
+    lda #$20 ; no rivers etc yet
     jsr fill_map_tile_at_x_y
     lda #$d4 ; from screen chars to color memory
     clc

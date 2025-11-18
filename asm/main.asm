@@ -50,16 +50,6 @@ start:
     STA $D01A
     cli
     jsr sound_explosion
-    lda #<plane_sprites
-    jsr print_hex
-    lda #>plane_sprites
-    jsr print_hex
-    ldx #3
-:
-    lda sprite_pointers,x
-    jsr print_hex
-    dex
-    bpl :-
     RTS
 debug_loop:
     lda #$13             ; home
