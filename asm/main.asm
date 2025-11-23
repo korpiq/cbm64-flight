@@ -1,8 +1,6 @@
 ; flight.asm
 .feature pc_assignment
 
-.export start
-
 ; zeropage resources
 screen_drawing_round_counter = 2
 sprite_tmp = $2a
@@ -14,12 +12,6 @@ joysticks = $FB
 joystick_switch_bit = 5
 map_tile_pointer = 5
 
-; program file
-*=$0801
-.word * ; first two bytes of a PRG file: starting memory address to load rest of the file at
-*=$0801
-.byte 11, 8, 221, 49, 158, 50, 48, 54, 49, 0, 0, 0 ; SYS2061
-*=2061
 start:
     lda #$9b             ; grey
     jsr $ffd2
