@@ -188,3 +188,117 @@ get_tile_height_at_x_y: ; y = tile row #; a = tile # on row from left => a = hei
 
     RTS
 
+get_tile_x_y_north_east: ; y = tile row #; a = tile # on that row from left
+    cpy #0
+    beq get_tile_x_y_over_map_pole
+    cpy #(map_rows_total_count / 2 + 1)
+    bcc :+
+    ; Southern side, so NorthEast is X + offset of old row + 1
+    clc
+    adc map_row_offset, y ; X += offset of old row
+    dey ; 1 row North
+    jmp get_tile_x_y_east ; X += 1
+:
+    ; Northern side, so NorthEast is X - offset of new row
+    dey ; 1 row North
+    sec
+    sbc map_row_offset, y
+    bpl :+
+    lda #0 ; off tile top on western edge lands on western edge of new row
+    RTS
+:
+    cmp map_row_length, y ; off eastern edge?
+    bcc get_tile_x_on_eastern_edge
+    RTS
+
+get_tile_x_y_north_west: ; y = tile row #; a = tile # on that row from left
+    cpy #0
+    beq get_tile_x_y_over_map_pole
+    cpy #(map_rows_total_count / 2 + 1)
+    bcc :+
+    ; Southern side, so NorthWest is X + offset of old row; always lands on map
+    clc
+    adc map_row_offset, y
+    dey ; 1 row North
+    RTS
+:
+    ; Northern side, so NorthWest is X - offset of new row - 1
+    dey ; 1 row North
+    sec
+    sbc #1 ; X -= 1
+    bmi get_tile_x_on_eastern_edge ; off tile top western corner lands to eastern edge
+    sec
+    sbc map_row_offset, y ; X -= offset of new row
+    bpl :+
+    lda #0 ; off tile top on western edge lands on western edge of new row
+:
+    RTS
+
+get_tile_x_y_over_map_pole:
+    ; go over North/South pole to its other side
+    cmp #map_row_at_pole_half_length
+    bcc :+
+    sbc #map_row_at_pole_half_length
+    RTS
+:
+    adc #map_row_at_pole_half_length
+    RTS
+
+get_tile_x_y_east: ; y = tile row #; a = tile # on that row from left
+    clc
+    adc #1
+    cmp map_row_length, y
+    bcs :+
+    lda #0
+:
+    RTS
+
+get_tile_x_y_west: ; y = tile row #; a = tile # on that row from left
+    cmp #0
+    bne :+
+get_tile_x_on_eastern_edge: ; 
+    lda map_row_length, y
+:
+    sec
+    sbc #1
+    RTS
+
+get_tile_x_y_south_east: ; y = tile row #; a = tile # on that row from left
+    cpy #(map_rows_total_count - 1)
+    bcs get_tile_x_y_over_map_pole
+    cpy #(map_rows_total_count / 2)
+    bcs :+
+    ; Northern side, so SouthEast is X + offset of old row + 1; always lands on map
+    adc map_row_offset, y ; X += offset of old row
+    iny ; 1 row South
+    jmp get_tile_x_y_east ; X += 1
+:
+    ; Southern side, so SouthEast is X - offset of new row
+    iny ; 1 row South
+    sbc map_row_offset, y ; X -= offset of old row
+    bcc :+
+    jmp get_tile_x_y_east ; X += 1
+:
+    lda #0
+    RTS
+
+get_tile_x_y_south_west: ; y = tile row #; a = tile # on that row from left
+    cpy #(map_rows_total_count - 1)
+    beq get_tile_x_y_over_map_pole
+    cpy #(map_rows_total_count / 2)
+    bcs :+
+    ; Northern side, so SouthWest is X + offset of old row; always lands on map
+    adc map_row_offset, y
+    iny ; 1 row South
+    RTS
+:
+    ; Southern side, so SouthWest is X - offset of new row - 1
+    iny ; 1 row South
+    sbc #1 ; X -= 1
+    bmi get_tile_x_on_eastern_edge ; off tile top western corner lands to eastern edge
+    sec
+    sbc map_row_offset, y ; X -= offset of new row
+    bpl :+
+    lda #0 ; off tile top on western edge lands on western edge of new row
+:
+    RTS

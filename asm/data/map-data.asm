@@ -3,8 +3,14 @@ map_row_length: ; in tiles aka double characters
     .byte 18, 19, 18
     .byte 17, 14,  11,  6
 map_rows_total_count = <(* - map_row_length)
+map_row_at_pole_half_length = 3
 
 .out .sprintf("map_rows_total_count = %d", map_rows_total_count)
+
+map_row_offset: ; full tile offsets between rows; each row is also half tile off its neighbors
+    .byte 2, 1, 1, 0
+    .byte 0, 0, 0
+    .byte 0, 1, 1, 2
 
 map_screen_row_offsets: ; single character spaces
     .byte 14, 9, 6, 3
