@@ -276,10 +276,9 @@ get_tile_x_y_south_east: ; y = tile row #; a = tile # on that row from left
     ; Southern side, so SouthEast is X - offset of new row
     iny ; 1 row South
     sbc map_row_offset, y ; X -= offset of old row
-    bcc :+
-    jmp get_tile_x_y_east ; X += 1
-:
+    bcs :+
     lda #0
+:
     RTS
 
 get_tile_x_y_south_west: ; y = tile row #; a = tile # on that row from left

@@ -1,5 +1,8 @@
 
 test_tile_addressing:
+    lda #<title_test_tile_addressing
+    ldy #>title_test_tile_addressing
+    jsr $ab1e
     ldy #(map_rows_total_count / 2) ; y = middle row
     lda map_row_length, y
     lsr ; a = middle of middle row
@@ -58,3 +61,4 @@ base_test_tile_address_y: .byte 0
 buffer_test_tile_address_x: .byte 0
 buffer_test_tile_address_y: .byte 0
 string_test_tile_address: .byte "tile address\n", 0
+title_test_tile_addressing: .byte "1. test tile addressing:\n- from center to each direction and back\n", 0
