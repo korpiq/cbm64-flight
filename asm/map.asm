@@ -248,7 +248,7 @@ get_tile_x_y_east: ; y = tile row #; a = tile # on that row from left
     clc
     adc #1
     cmp map_row_length, y
-    bcs :+
+    bcc :+
     lda #0
 :
     RTS
