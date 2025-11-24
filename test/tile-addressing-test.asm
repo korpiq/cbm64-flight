@@ -10,6 +10,10 @@ test_tile_addressing:
     sty buffer_test_tile_address_y
     sta buffer_test_tile_address_x
     jsr print_test_tile_address
+    jsr get_tile_x_y_south_west
+    sty buffer_test_tile_address_y
+    sta buffer_test_tile_address_x
+    jsr print_test_tile_address
     RTS
 
 print_test_tile_address:

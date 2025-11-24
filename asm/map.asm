@@ -208,7 +208,7 @@ get_tile_x_y_north_east: ; y = tile row #; a = tile # on that row from left
     RTS
 :
     cmp map_row_length, y ; off eastern edge?
-    bcc get_tile_x_on_eastern_edge
+    bcs get_tile_x_on_eastern_edge
     RTS
 
 get_tile_x_y_north_west: ; y = tile row #; a = tile # on that row from left
