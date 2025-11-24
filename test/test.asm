@@ -33,7 +33,7 @@ string_tests_starting: .byte "starting tests\n", 0
 string_tests_done: .byte "tests done\n", 0
 string_test_failed: .byte "test failed\n", 0
 test_number: .byte 0
-tests_total = 4
+tests_total = 6
 
 .include "tile-addressing-test.asm"
 .include "../asm/main.asm"

@@ -3,12 +3,23 @@ test_tile_addressing:
     lda #<title_test_tile_addressing
     ldy #>title_test_tile_addressing
     jsr $ab1e
+
     ldy #(map_rows_total_count / 2) ; y = middle row
     lda map_row_length, y
     lsr ; a = middle of middle row
     sty base_test_tile_address_y
     sta base_test_tile_address_x
+
     jsr print_test_tile_address
+    jsr get_tile_x_y_east
+    jsr print_test_tile_address
+    jsr get_tile_x_y_west
+    jsr check_test_tile_address_equals_base
+    jsr get_tile_x_y_west
+    jsr print_test_tile_address
+    jsr get_tile_x_y_east
+    jsr check_test_tile_address_equals_base
+
     jsr get_tile_x_y_north_east
     jsr print_test_tile_address
     jsr get_tile_x_y_south_west
