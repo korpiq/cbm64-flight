@@ -40,6 +40,7 @@ input_character:
     beq input_complete
     cmp #$14
     bne check_input_character
+erase_last_character:
     ldy planet_name_length
     beq input_character
     dey
@@ -53,15 +54,30 @@ check_input_character:
     ldy #12
     clc
     jsr $e50a
+    pla
+    pha
     jsr print_hex
     pla
     pha
     jsr $ffd2
     pla
-    cmp #$40
-    bcc input_character
     cmp #$5b
     bcs input_character
+    cmp #$40
+    bcs input_character_ok
+    cmp #$39
+    bcs squash_input_character
+    cmp #$30
+    bcs input_character_ok
+squash_input_character:
+    ldy planet_name_length
+    beq input_character ; not as first letter
+    dey
+    ldx planet_name, y
+    cpx #$30
+    bcc input_character ; no multiple dashes
+    lda #$2d
+input_character_ok:
     ldy planet_name_length
     cpy #planet_name_max_length
     bcs input_character
@@ -69,8 +85,12 @@ check_input_character:
     inc planet_name_length
     jmp input_planet_name
 input_complete:
-    lda planet_name_length
-    beq input_planet_name
+    ldy planet_name_length
+    beq input_character
+    dey
+    lda planet_name, y
+    cmp #$30
+    bcc erase_last_character
 
     jsr chars_init
     jsr map_init
