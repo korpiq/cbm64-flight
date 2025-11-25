@@ -20,6 +20,7 @@ start:
     lda #0
     sta $d020
     sta $d021
+    sta $cc ; show cursor
 input_planet_name:
     ldx #10
     ldy #2
@@ -31,8 +32,6 @@ input_planet_name:
     lda #<planet_name
     ldy #>planet_name
     jsr $ab1e ; print input
-    lda #$20
-    jsr $ffd2 ; space
 input_character:
     jsr $f13e
     beq input_character
@@ -47,7 +46,9 @@ erase_last_character:
     sty planet_name_length
     lda #0
     sta planet_name, y
-    beq input_planet_name
+    lda #$14
+    jsr $ffd2 ; backspace
+    jmp input_planet_name
 check_input_character:
     cmp #$5b
     bcs input_character
@@ -79,6 +80,7 @@ input_complete:
     lda planet_name, y
     cmp #$30
     bcc erase_last_character
+    sta $cc ; hide cursor
 
     jsr chars_init
     jsr map_init
