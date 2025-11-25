@@ -27,6 +27,29 @@ map_init:
     ora #$40
     sta $d011
 
+; print planet name at top
+    lda #40
+    sec
+    sbc planet_name_length
+    lsr
+    tay
+    ldx #0
+    clc
+    jsr $e50a ; center planet name on top of screen
+    lda #<planet_name
+    ldy #>planet_name
+    jsr $ab1e ; print planet name
+    lda #$0d
+    jsr $ffd2
+
+    ldy #27
+:
+    lda $0400, y
+    ora #$c0 ; use top bg color
+    sta $0400, y
+    dey
+    bne :-
+
 ; generate height for each map tile
     lda #>(map_tile_heights)
     sta map_tile_pointer + 1

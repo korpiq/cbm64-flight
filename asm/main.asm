@@ -52,7 +52,7 @@ erase_last_character:
 check_input_character:
     cmp #$5b
     bcs input_character
-    cmp #$40
+    cmp #$41
     bcs input_character_ok
     cmp #$3a
     bcs squash_input_character
@@ -65,7 +65,7 @@ squash_input_character:
     ldx planet_name, y
     cpx #$30
     bcc input_character ; no multiple dashes
-    lda #$2d
+    lda #$20
 input_character_ok:
     ldy planet_name_length
     cpy #planet_name_max_length
@@ -82,12 +82,18 @@ input_complete:
     bcc erase_last_character
     sta $cc ; hide cursor
 
+    lda #$90             ; black
+    jsr $ffd2
+    lda #$93             ; clear screen
+    jsr $ffd2
+
     jsr chars_init
     jsr map_init
     jsr joys_init
     jsr planes_init
     jsr sound_init
     jsr start_plane_sounds
+
     sei ; avoid blinking caused by interrupts
     LDA #%01111111
     STA $DC0D            ; switch off interrupt signals from CIA-1

@@ -80,7 +80,7 @@ total_tiles_left:
 
 planet_name_length: .byte 0
 planet_name:
-.repeat 26
+.repeat 25
  .byte 0
 .endrep
 planet_name_max_length = * - planet_name - 1
