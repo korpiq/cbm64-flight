@@ -49,23 +49,11 @@ erase_last_character:
     sta planet_name, y
     beq input_planet_name
 check_input_character:
-    pha
-    ldx #12
-    ldy #12
-    clc
-    jsr $e50a
-    pla
-    pha
-    jsr print_hex
-    pla
-    pha
-    jsr $ffd2
-    pla
     cmp #$5b
     bcs input_character
     cmp #$40
     bcs input_character_ok
-    cmp #$39
+    cmp #$3a
     bcs squash_input_character
     cmp #$30
     bcs input_character_ok
