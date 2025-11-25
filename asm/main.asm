@@ -85,6 +85,7 @@ input_complete:
 ; seed random number generator with the planet name
     ldy #4
     lda #$0
+    sta swap
 :
     sta $8b, y
     dey
@@ -92,17 +93,23 @@ input_complete:
     iny
     clc
     ldx #4
-:
+@add_next_char_to_rnd_seed:
     lda $8b, x
+    adc swap
+    asl
     adc planet_name, y
     sta $8b, x
+    bcs :+
+    lda #0
+:
+    sta swap
     dex
     bpl :+
     ldx #4
 :
     iny
     cpy planet_name_length
-    bcc :--
+    bcc @add_next_char_to_rnd_seed
 
     lda #$90             ; black
     jsr $ffd2
