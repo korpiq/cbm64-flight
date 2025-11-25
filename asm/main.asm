@@ -19,6 +19,59 @@ start:
     jsr $ffd2
     lda #0
     sta $d020
+    sta $d021
+input_planet_name:
+    ldx #10
+    ldy #2
+    clc
+    jsr $e50a
+    lda #<planet_name_prompt
+    ldy #>planet_name_prompt
+    jsr $ab1e ; print prompt
+    lda #<planet_name
+    ldy #>planet_name
+    jsr $ab1e ; print input
+    lda #$20
+    jsr $ffd2 ; space
+input_character:
+    jsr $f13e
+    beq input_character
+    cmp #$0d
+    beq input_complete
+    cmp #$14
+    bne check_input_character
+    ldy planet_name_length
+    beq input_character
+    dey
+    sty planet_name_length
+    lda #0
+    sta planet_name, y
+    beq input_planet_name
+check_input_character:
+    pha
+    ldx #12
+    ldy #12
+    clc
+    jsr $e50a
+    jsr print_hex
+    pla
+    pha
+    jsr $ffd2
+    pla
+    cmp #$40
+    bcc input_character
+    cmp #$5b
+    bcs input_character
+    ldy planet_name_length
+    cpy #planet_name_max_length
+    bcs input_character
+    sta planet_name, y
+    inc planet_name_length
+    jmp input_planet_name
+input_complete:
+    lda planet_name_length
+    beq input_planet_name
+
     jsr chars_init
     jsr map_init
     jsr joys_init

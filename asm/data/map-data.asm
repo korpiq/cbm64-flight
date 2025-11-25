@@ -77,3 +77,11 @@ total_tiles_left:
 
 .out .sprintf("tiles_per_type = %d", tiles_per_type);
 .out .sprintf("tiles in bags total = %d", tiles_per_type * map_level_colors_total_count);
+
+planet_name_length: .byte 0
+planet_name:
+.repeat 26
+ .byte 0
+.endrep
+planet_name_max_length = * - planet_name - 1
+planet_name_prompt: .byte "planet name: ", 0
