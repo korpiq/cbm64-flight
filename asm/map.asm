@@ -50,6 +50,21 @@ map_init:
     dey
     bne :-
 
+    ldy #0
+    ldx #1
+    clc
+    jsr $e50a ; print at start of second row
+    lda $8b
+    jsr print_hex
+    lda $8c
+    jsr print_hex
+    lda $8d
+    jsr print_hex
+    lda $8e
+    jsr print_hex
+    lda $8f
+    jsr print_hex
+
 ; generate height for each map tile
     lda #>(map_tile_heights)
     sta map_tile_pointer + 1

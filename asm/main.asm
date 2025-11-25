@@ -82,6 +82,28 @@ input_complete:
     bcc erase_last_character
     sta $cc ; hide cursor
 
+; seed random number generator with the planet name
+    ldy #4
+    lda #$0
+:
+    sta $8b, y
+    dey
+    bpl :-
+    iny
+    clc
+    ldx #4
+:
+    lda $8b, x
+    adc planet_name, y
+    sta $8b, x
+    dex
+    bpl :+
+    ldx #4
+:
+    iny
+    cpy planet_name_length
+    bcc :--
+
     lda #$90             ; black
     jsr $ffd2
     lda #$93             ; clear screen
