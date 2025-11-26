@@ -246,6 +246,6 @@ bss:
 .bss
 
 ; each written data area consecutively after loaded file
-map_tile_heights = bss
+map_tile_heights = (1 + .hibyte(bss)) * 256
 
-currently_used_bss_end = bss + map_tiles_total_count ; next data area can start here
+currently_used_bss_end = map_tile_heights + map_tiles_total_count ; next data area can start here
