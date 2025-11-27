@@ -11,6 +11,8 @@ multiplication_factor = 4
 joysticks = $FB
 joystick_switch_bit = 5
 map_tile_pointer = 5
+random_exponent = $8b
+random_mantissa = $bc
 
 start:
     lda #$9b             ; grey
@@ -83,29 +85,31 @@ input_complete:
     sta $cc ; hide cursor
 
 ; seed random number generator with the planet name
-    ldy #4
+    lda #$80
+    sta random_exponent
     lda #$0
     sta swap
+    ldy #3
 :
-    sta $8b, y
+    sta random_mantissa, y
     dey
     bpl :-
     iny
     clc
-    ldx #4
+    ldx #3
 @add_next_char_to_rnd_seed:
-    lda $8b, x
+    lda random_mantissa, x
     adc swap
     asl
     adc planet_name, y
-    sta $8b, x
+    sta random_mantissa, x
     bcs :+
     lda #0
 :
     sta swap
     dex
     bpl :+
-    ldx #4
+    ldx #3
 :
     iny
     cpy planet_name_length
@@ -245,7 +249,13 @@ joys_irq:
 bss:
 .bss
 
+map_current_tile_neighbors = bss
+* = map_current_tile_neighbors + 8
+
 ; each written data area consecutively after loaded file
-map_tile_heights = (1 + .hibyte(bss)) * 256
+map_tile_heights = (1 + .hibyte(*)) * 256
 
 currently_used_bss_end = map_tile_heights + map_tiles_total_count ; next data area can start here
+
+.out .sprintf("map_current_tile_neighbors = %d", map_current_tile_neighbors)
+.out .sprintf("map_tile_heights = %d", map_tile_heights)

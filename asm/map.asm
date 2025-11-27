@@ -54,16 +54,16 @@ map_init:
     ldx #1
     clc
     jsr $e50a ; print at start of second row
-    lda $8b
+    lda #$0
+:
+    pha
+    tax
+    lda random_mantissa, x
     jsr print_hex
-    lda $8c
-    jsr print_hex
-    lda $8d
-    jsr print_hex
-    lda $8e
-    jsr print_hex
-    lda $8f
-    jsr print_hex
+    pla
+    adc #1
+    cmp #4
+    bne :-
 
 ; generate height for each map tile
     lda #>(map_tile_heights)
@@ -80,7 +80,7 @@ map_init:
     dey
     lda #0 ; prefill map border with sea
     sta (map_tile_pointer), y
-    lda #$8 ; prefill map with unused value to differentiate ungenerated from generated tiles
+    lda #$80 ; prefill map with unused value to differentiate ungenerated from generated tiles
 :
     tya
     pha
@@ -102,6 +102,8 @@ map_init:
     tay
     dey
     bpl @fill_tile_row
+
+
 
 ; draw map
     ldy #(map_rows_total_count) ; how many rows in map
