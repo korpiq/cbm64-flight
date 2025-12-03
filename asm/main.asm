@@ -6,13 +6,17 @@ screen_drawing_round_counter = 2
 sprite_tmp = $2a
 sound_buffer = $52
 swap = 3
+temp_offset = 3
 multiplication_lo = 3
 multiplication_factor = 4
+temp_x = 3
+temp_y = 4
 joysticks = $FB
 joystick_switch_bit = 5
 map_tile_pointer = 5
 random_exponent = $8b
 random_mantissa = $bc
+current_map_tile_bag = $68
 
 start:
     lda #$9b             ; grey
@@ -250,7 +254,7 @@ bss:
 .bss
 
 map_current_tile_neighbors = bss
-* = map_current_tile_neighbors + 8
+* = map_current_tile_neighbors + 6
 
 ; each written data area consecutively after loaded file
 map_tile_heights = (1 + .hibyte(*)) * 256
@@ -259,3 +263,4 @@ currently_used_bss_end = map_tile_heights + map_tiles_total_count ; next data ar
 
 .out .sprintf("map_current_tile_neighbors = %d", map_current_tile_neighbors)
 .out .sprintf("map_tile_heights = %d", map_tile_heights)
+.out .sprintf("currently_used_bss_end = %d", currently_used_bss_end)

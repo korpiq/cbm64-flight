@@ -80,19 +80,9 @@ map_init:
     dey
     lda #0 ; prefill map border with sea
     sta (map_tile_pointer), y
-    lda #$80 ; prefill map with unused value to differentiate ungenerated from generated tiles
+    dey
 :
-    tya
-    pha
-    txa
-    pha
-    jsr get_random_byte ; start with random height – later only for map center row edges, rest weighed by neighbors and bags
-    pla
-    tax
-    pla
-    tay
-    lda random_byte_address
-    and #7
+    lda #$80 ; prefill map with unused value to differentiate ungenerated from generated tiles
     sta (map_tile_pointer), y
     dey
     bne :-
@@ -103,7 +93,20 @@ map_init:
     dey
     bpl @fill_tile_row
 
-
+; go by x and y to fill each tile to match its neighbors
+    ldy #map_rows_total_count
+    dey
+:
+    ldx map_row_length, y
+    dex
+:
+    jsr define_map_tile_height
+    ldy temp_y
+    ldx temp_x
+    dex
+    bpl :-
+    dey
+    bpl :--
 
 ; draw map
     ldy #(map_rows_total_count) ; how many rows in map
@@ -341,3 +344,125 @@ get_tile_x_y_south_west: ; y = tile row #; a = tile # on that row from left
     lda #0 ; off tile top on western edge lands on western edge of new row
 :
     RTS
+
+define_map_tile_height: ; y = map tile row#, x = tile # on that row from left => a = map tile height
+
+; load_current_tile_neighbor_heights:
+    sty temp_y
+    stx temp_x
+    lda temp_y
+    jsr print_hex
+    lda temp_x
+    jsr print_hex
+    ldx #0
+    stx temp_offset
+    ldy temp_y
+    lda temp_x
+    jsr get_tile_x_y_north_east
+    jsr get_tile_height_at_x_y
+    cmp #$80
+    bcs :+
+    jsr @store_tile_neighbor_height
+:
+    ldy temp_y
+    lda temp_x
+    jsr get_tile_x_y_east
+    jsr get_tile_height_at_x_y
+    cmp #$80
+    bcs :+
+    jsr @store_tile_neighbor_height
+:
+    ldy temp_y
+    lda temp_x
+    jsr get_tile_x_y_south_east
+    jsr get_tile_height_at_x_y
+    cmp #$80
+    bcs :+
+    jsr @store_tile_neighbor_height
+:
+    ldy temp_y
+    lda temp_x
+    jsr get_tile_x_y_south_west
+    jsr get_tile_height_at_x_y
+    cmp #$80
+    bcs :+
+    jsr @store_tile_neighbor_height
+:
+    ldy temp_y
+    lda temp_x
+    jsr get_tile_x_y_west
+    jsr get_tile_height_at_x_y
+    cmp #$80
+    bcs :+
+    jsr @store_tile_neighbor_height
+:
+    ldy temp_y
+    lda temp_x
+    jsr get_tile_x_y_north_west
+    jsr get_tile_height_at_x_y
+    cmp #$80
+    bcs :+
+    jsr @store_tile_neighbor_height
+:
+; take random neighbor's height
+    lda temp_offset
+    jsr get_random_below_a
+    sta current_map_tile_bag
+    tay
+    lda tile_bags, y
+    sta temp_offset ; height proposed by existing tile
+    clc
+    adc #2
+    jsr get_random_below_a
+    cmp temp_offset
+    beq @take_lower_tile
+    bcs @take_higher_tile
+@set_proposed_tile_height: ; temp_offset = proposed tile height, (temp_x, temp_y) = location on map
+    ldx temp_offset
+    dec tile_bags, x
+    lda temp_x
+    ldy temp_y
+    clc
+    adc map_tile_row_offsets, y
+    tay
+    txa
+    sta map_tile_heights, y
+
+    RTS
+
+@store_tile_neighbor_height:
+    ldy temp_offset
+    sta map_current_tile_neighbors, y
+    inc temp_offset
+    RTS
+
+@take_lower_tile:
+    ldy current_map_tile_bag
+    dey
+    bpl :+
+    ldy #7
+:
+    lda tile_bags, y
+    sta temp_offset ; height proposed by existing tile
+    clc
+    adc #1
+    jsr get_random_below_a
+    cmp temp_offset
+    bcc @set_proposed_tile_height
+    bcs @take_lower_tile
+
+@take_higher_tile:
+    ldy current_map_tile_bag
+    iny
+    cpy #8
+    bcc :+
+    ldy #0
+:
+    lda tile_bags, y
+    sta temp_offset ; height proposed by existing tile
+    clc
+    adc #1
+    jsr get_random_below_a
+    cmp temp_offset
+    bcc @set_proposed_tile_height
+    bcs @take_higher_tile
