@@ -101,8 +101,8 @@ map_init:
     dex
 :
     jsr define_map_tile_height
-    ldy temp_y
-    ldx temp_x
+    ldy map_build_y
+    ldx map_build_x
     dex
     bpl :-
     dey
@@ -347,83 +347,62 @@ get_tile_x_y_south_west: ; y = tile row #; a = tile # on that row from left
 
 define_map_tile_height: ; y = map tile row#, x = tile # on that row from left => a = map tile height
 
-    lda #$93             ; clear screen
+    sty map_build_y
+    stx map_build_x
+; debug print
+    lda #$13             ; home
     jsr $ffd2
-    sty temp_y
-    stx temp_x
-    lda temp_y
+    lda map_build_y
     jsr print_hex
-    lda temp_x
+    lda map_build_x
     jsr print_hex
-    ldx #0
-    stx temp_offset
 ; load_current_tile_neighbor_heights:
-    ldy temp_y
-    lda temp_x
+    lda #0
+    sta map_build_surrounding_heights_offset
+    lda map_build_x
+    ldy map_build_y
     jsr get_tile_x_y_north_east
-    jsr get_tile_height_at_x_y
-    cmp #$80
-    bcs :+
-    jsr @store_tile_neighbor_height
-:
-    ldy temp_y
-    lda temp_x
+    jsr @store_tile_neighbor_height_at_x_y
+    ldy map_build_y
+    lda map_build_x
     jsr get_tile_x_y_east
-    jsr get_tile_height_at_x_y
-    cmp #$80
-    bcs :+
-    jsr @store_tile_neighbor_height
-:
-    ldy temp_y
-    lda temp_x
+    jsr @store_tile_neighbor_height_at_x_y
+    ldy map_build_y
+    lda map_build_x
     jsr get_tile_x_y_south_east
-    jsr get_tile_height_at_x_y
-    cmp #$80
-    bcs :+
-    jsr @store_tile_neighbor_height
-:
-    ldy temp_y
-    lda temp_x
+    jsr @store_tile_neighbor_height_at_x_y
+    ldy map_build_y
+    lda map_build_x
     jsr get_tile_x_y_south_west
-    jsr get_tile_height_at_x_y
-    cmp #$80
-    bcs :+
-    jsr @store_tile_neighbor_height
-:
-    ldy temp_y
-    lda temp_x
+    jsr @store_tile_neighbor_height_at_x_y
+    ldy map_build_y
+    lda map_build_x
     jsr get_tile_x_y_west
-    jsr get_tile_height_at_x_y
-    cmp #$80
-    bcs :+
-    jsr @store_tile_neighbor_height
-:
-    ldy temp_y
-    lda temp_x
+    jsr @store_tile_neighbor_height_at_x_y
+    ldy map_build_y
+    lda map_build_x
     jsr get_tile_x_y_north_west
-    jsr get_tile_height_at_x_y
-    cmp #$80
-    bcs :+
-    jsr @store_tile_neighbor_height
-:
+    jsr @store_tile_neighbor_height_at_x_y
 ; take random neighbor's height
-    lda temp_offset
+    lda map_build_surrounding_heights_offset
     jsr get_random_below_a
-    sta current_map_tile_bag
+    sta current_map_tile_bag ; height proposed by some neighboring tile
     tay
     lda tile_bags, y
-    sta temp_offset ; height proposed by existing tile
     clc
-    adc #2
+    adc #2 ; chances to take lower or higher tile
     jsr get_random_below_a
-    cmp temp_offset
+    cmp tile_bags, y
     beq @take_lower_tile
     bcs @take_higher_tile
-@set_proposed_tile_height: ; temp_offset = proposed tile height, (temp_x, temp_y) = location on map
-    ldx temp_offset
+    sta map_build_height
+@set_proposed_tile_height: ; map_build_height = proposed tile height, (map_build_x, map_build_y) = location on map
+    lda map_build_height
+    jsr print_hex
+    ldx map_build_height
     dec tile_bags, x
-    lda temp_x
-    ldy temp_y
+    lda map_build_x
+    ldy map_build_y
     clc
     adc map_tile_row_offsets, y
     tay
@@ -432,10 +411,14 @@ define_map_tile_height: ; y = map tile row#, x = tile # on that row from left =>
 
     RTS
 
-@store_tile_neighbor_height:
-    ldy temp_offset
+@store_tile_neighbor_height_at_x_y:
+    jsr get_tile_height_at_x_y
+    cmp #$80
+    bcs :+
+    ldy map_build_surrounding_heights_offset
     sta map_current_tile_neighbors, y
-    inc temp_offset
+    inc map_build_surrounding_heights_offset
+:
     RTS
 
 @take_lower_tile:
@@ -444,12 +427,13 @@ define_map_tile_height: ; y = map tile row#, x = tile # on that row from left =>
     bpl :+
     ldy #7
 :
+    sty current_map_tile_bag
     lda tile_bags, y
-    sta temp_offset ; height proposed by existing tile
+    sta map_build_height ; height proposed by existing tile
     clc
     adc #1
     jsr get_random_below_a
-    cmp temp_offset
+    cmp map_build_height
     bcc @set_proposed_tile_height
     bcs @take_lower_tile
 
@@ -460,11 +444,12 @@ define_map_tile_height: ; y = map tile row#, x = tile # on that row from left =>
     bcc :+
     ldy #0
 :
+    sty current_map_tile_bag
     lda tile_bags, y
-    sta temp_offset ; height proposed by existing tile
+    sta map_build_height ; height proposed by existing tile
     clc
     adc #1
     jsr get_random_below_a
-    cmp temp_offset
+    cmp map_build_height
     bcc @set_proposed_tile_height
     bcs @take_higher_tile
