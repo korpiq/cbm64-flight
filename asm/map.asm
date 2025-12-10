@@ -347,7 +347,8 @@ get_tile_x_y_south_west: ; y = tile row #; a = tile # on that row from left
 
 define_map_tile_height: ; y = map tile row#, x = tile # on that row from left => a = map tile height
 
-; load_current_tile_neighbor_heights:
+    lda #$93             ; clear screen
+    jsr $ffd2
     sty temp_y
     stx temp_x
     lda temp_y
@@ -356,6 +357,7 @@ define_map_tile_height: ; y = map tile row#, x = tile # on that row from left =>
     jsr print_hex
     ldx #0
     stx temp_offset
+; load_current_tile_neighbor_heights:
     ldy temp_y
     lda temp_x
     jsr get_tile_x_y_north_east

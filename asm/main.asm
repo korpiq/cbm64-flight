@@ -3,20 +3,20 @@
 
 ; zeropage resources
 screen_drawing_round_counter = 2
-sprite_tmp = $2a
-sound_buffer = $52
 swap = 3
-temp_offset = 3
 multiplication_lo = 3
 multiplication_factor = 4
-temp_x = 3
-temp_y = 4
 joysticks = $FB
 joystick_switch_bit = 5
 map_tile_pointer = 5
+sprite_tmp = $2a
+sound_buffer = $52
+temp_x = $5c
+temp_y = $5d
+temp_offset = $5e
+current_map_tile_bag = $68
 random_exponent = $8b
 random_mantissa = $bc
-current_map_tile_bag = $68
 
 start:
     lda #$9b             ; grey
