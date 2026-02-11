@@ -386,6 +386,8 @@ define_map_tile_height: ; y = map tile row#, x = tile # on that row from left =>
 ; take random neighbor's height
     lda map_build_surrounding_heights_offset
     jsr get_random_below_a
+    tay
+    lda map_current_tile_neighbors, y
     sta current_map_tile_bag ; height proposed by some neighboring tile
     tay
     lda tile_bags, y
