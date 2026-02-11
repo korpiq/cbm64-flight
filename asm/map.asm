@@ -397,6 +397,7 @@ define_map_tile_height: ; y = map tile row#, x = tile # on that row from left =>
     cmp tile_bags, y
     beq @take_lower_tile
     bcs @take_higher_tile
+    lda current_map_tile_bag ; use height associated with current bag
     sta map_build_height
 @set_proposed_tile_height: ; map_build_height = proposed tile height, (map_build_x, map_build_y) = location on map
     lda map_build_height
@@ -427,31 +428,28 @@ define_map_tile_height: ; y = map tile row#, x = tile # on that row from left =>
     ldy current_map_tile_bag
     dey
     bpl :+
-    ldy #7
+    ldy #0
 :
-    sty current_map_tile_bag
-    lda tile_bags, y
-    sta map_build_height ; height proposed by existing tile
-    clc
-    adc #1
-    jsr get_random_below_a
-    cmp map_build_height
-    bcc @set_proposed_tile_height
-    bcs @take_lower_tile
+    sty map_build_height ; propose this height unless bag is empty
+    sty current_map_tile_bag ; FIXME: one or the other is probably extra?
+    lda tile_bags, y ; does bag still have tiles in it?
+    bpl @set_proposed_tile_height ; yes, use this height
+    dey ; bag is empty, look into next lower one
+    bpl :- ; try the next lower bag
+    bmi @take_higher_tile ; all out of lower bags so look the other way
 
 @take_higher_tile:
     ldy current_map_tile_bag
     iny
     cpy #8
     bcc :+
-    ldy #0
+    ldy #7
 :
-    sty current_map_tile_bag
-    lda tile_bags, y
-    sta map_build_height ; height proposed by existing tile
-    clc
-    adc #1
-    jsr get_random_below_a
-    cmp map_build_height
-    bcc @set_proposed_tile_height
-    bcs @take_higher_tile
+    sty map_build_height ; propose this height unless bag is empty
+    sty current_map_tile_bag ; FIXME: one or the other is probably extra?
+    lda tile_bags, y ; does bag still have tiles in it?
+    bpl @set_proposed_tile_height ; yes, use this height
+    iny ; bag is empty, look into next higher one
+    cpy #8 ; did we go past heights?
+    bcc :- ; try the next higher bag
+    bmi @take_lower_tile ; all out of higher bags so look the other way
