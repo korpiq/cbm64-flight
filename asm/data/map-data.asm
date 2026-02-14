@@ -37,7 +37,7 @@ map_tiles_total_count = (6 + 11 + 14 + 17 + 18) *2 + 19
 .out .sprintf("map_tiles_total_count = %d", map_tiles_total_count)
 
 map_level_colors:
-    .byte 6, 14, 13, 5, 8, 10, 12, 15
+    .byte 6, 14, 13, 5, 9, 8, 12, 15
 map_level_colors_total_count = * - map_level_colors
 
 map_background_color_blue = 14

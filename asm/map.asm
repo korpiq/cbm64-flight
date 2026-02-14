@@ -80,19 +80,9 @@ map_init:
     dey
     lda #0 ; prefill map border with sea
     sta (map_tile_pointer), y
-    lda #$80 ; prefill map with unused value to differentiate ungenerated from generated tiles
+    dey
 :
-    tya
-    pha
-    txa
-    pha
-    jsr get_random_byte ; start with random height – later only for map center row edges, rest weighed by neighbors and bags
-    pla
-    tax
-    pla
-    tay
-    lda random_byte_address
-    and #7
+    lda #$80 ; prefill map with unused value to differentiate ungenerated from generated tiles
     sta (map_tile_pointer), y
     dey
     bne :-
@@ -103,7 +93,20 @@ map_init:
     dey
     bpl @fill_tile_row
 
-
+; go by x and y to fill each tile to match its neighbors
+    ldy #map_rows_total_count
+    dey
+:
+    ldx map_row_length, y
+    dex
+:
+    jsr define_map_tile_height
+    ldy map_build_y
+    ldx map_build_x
+    dex
+    bpl :-
+    dey
+    bpl :--
 
 ; draw map
     ldy #(map_rows_total_count) ; how many rows in map
@@ -341,3 +344,112 @@ get_tile_x_y_south_west: ; y = tile row #; a = tile # on that row from left
     lda #0 ; off tile top on western edge lands on western edge of new row
 :
     RTS
+
+define_map_tile_height: ; y = map tile row#, x = tile # on that row from left => a = map tile height
+
+    sty map_build_y
+    stx map_build_x
+; debug print
+    lda #$13             ; home
+    jsr $ffd2
+    lda map_build_y
+    jsr print_hex
+    lda map_build_x
+    jsr print_hex
+; load_current_tile_neighbor_heights:
+    lda #0
+    sta map_build_surrounding_heights_offset
+    lda map_build_x
+    ldy map_build_y
+    jsr get_tile_x_y_north_east
+    jsr @store_tile_neighbor_height_at_x_y
+    ldy map_build_y
+    lda map_build_x
+    jsr get_tile_x_y_east
+    jsr @store_tile_neighbor_height_at_x_y
+    ldy map_build_y
+    lda map_build_x
+    jsr get_tile_x_y_south_east
+    jsr @store_tile_neighbor_height_at_x_y
+    ldy map_build_y
+    lda map_build_x
+    jsr get_tile_x_y_south_west
+    jsr @store_tile_neighbor_height_at_x_y
+    ldy map_build_y
+    lda map_build_x
+    jsr get_tile_x_y_west
+    jsr @store_tile_neighbor_height_at_x_y
+    ldy map_build_y
+    lda map_build_x
+    jsr get_tile_x_y_north_west
+    jsr @store_tile_neighbor_height_at_x_y
+; take random neighbor's height
+    lda map_build_surrounding_heights_offset
+    jsr get_random_below_a
+    tay
+    lda map_current_tile_neighbors, y
+    sta current_map_tile_bag ; height proposed by some neighboring tile
+    tay
+    lda tile_bags, y
+    clc
+    adc #2 ; chances to take lower or higher tile
+    jsr get_random_below_a
+    cmp tile_bags, y
+    beq @take_lower_tile
+    bcs @take_higher_tile
+    lda current_map_tile_bag ; use height associated with current bag
+    sta map_build_height
+@set_proposed_tile_height: ; map_build_height = proposed tile height, (map_build_x, map_build_y) = location on map
+    lda map_build_height
+    jsr print_hex
+    ldx map_build_height
+    dec tile_bags, x
+    lda map_build_x
+    ldy map_build_y
+    clc
+    adc map_tile_row_offsets, y
+    tay
+    txa
+    sta map_tile_heights, y
+
+    RTS
+
+@store_tile_neighbor_height_at_x_y:
+    jsr get_tile_height_at_x_y
+    cmp #$80
+    bcs :+
+    ldy map_build_surrounding_heights_offset
+    sta map_current_tile_neighbors, y
+    inc map_build_surrounding_heights_offset
+:
+    RTS
+
+@take_lower_tile:
+    ldy current_map_tile_bag
+    dey
+    bpl :+
+    ldy #0
+:
+    sty map_build_height ; propose this height unless bag is empty
+    sty current_map_tile_bag ; FIXME: one or the other is probably extra?
+    lda tile_bags, y ; does bag still have tiles in it?
+    bpl @set_proposed_tile_height ; yes, use this height
+    dey ; bag is empty, look into next lower one
+    bpl :- ; try the next lower bag
+    bmi @take_higher_tile ; all out of lower bags so look the other way
+
+@take_higher_tile:
+    ldy current_map_tile_bag
+    iny
+    cpy #8
+    bcc :+
+    ldy #7
+:
+    sty map_build_height ; propose this height unless bag is empty
+    sty current_map_tile_bag ; FIXME: one or the other is probably extra?
+    lda tile_bags, y ; does bag still have tiles in it?
+    bpl @set_proposed_tile_height ; yes, use this height
+    iny ; bag is empty, look into next higher one
+    cpy #8 ; did we go past heights?
+    bcc :- ; try the next higher bag
+    bmi @take_lower_tile ; all out of higher bags so look the other way
