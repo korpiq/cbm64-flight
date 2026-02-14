@@ -24,13 +24,9 @@ start:
     jsr $ffd2
     lda #$93             ; clear screen
     jsr $ffd2
-    lda #0
+    lda #6
     sta $d020
     sta $d021
-    lda #$90             ; black
-    jsr $ffd2
-    lda #$93             ; clear screen
-    jsr $ffd2
 
     jsr joys_init
     jsr planes_init
