@@ -27,106 +27,11 @@ start:
     lda #0
     sta $d020
     sta $d021
-    sta $cc ; show cursor
-input_planet_name:
-    ldx #10
-    ldy #2
-    clc
-    jsr $e50a
-    lda #<planet_name_prompt
-    ldy #>planet_name_prompt
-    jsr $ab1e ; print prompt
-    lda #<planet_name
-    ldy #>planet_name
-    jsr $ab1e ; print input
-input_character:
-    jsr $f13e
-    beq input_character
-    cmp #$0d
-    beq input_complete
-    cmp #$14
-    bne check_input_character
-erase_last_character:
-    ldy planet_name_length
-    beq input_character
-    dey
-    sty planet_name_length
-    lda #0
-    sta planet_name, y
-    lda #$14
-    jsr $ffd2 ; backspace
-    jmp input_planet_name
-check_input_character:
-    cmp #$5b
-    bcs input_character
-    cmp #$41
-    bcs input_character_ok
-    cmp #$3a
-    bcs squash_input_character
-    cmp #$30
-    bcs input_character_ok
-squash_input_character:
-    ldy planet_name_length
-    beq input_character ; not as first letter
-    dey
-    ldx planet_name, y
-    cpx #$30
-    bcc input_character ; no multiple dashes
-    lda #$20
-input_character_ok:
-    ldy planet_name_length
-    cpy #planet_name_max_length
-    bcs input_character
-    sta planet_name, y
-    inc planet_name_length
-    jmp input_planet_name
-input_complete:
-    ldy planet_name_length
-    beq input_character
-    dey
-    lda planet_name, y
-    cmp #$30
-    bcc erase_last_character
-    sta $cc ; hide cursor
-
-; seed random number generator with the planet name
-    lda #$80
-    sta random_exponent
-    lda #$0
-    sta swap
-    ldy #3
-:
-    sta random_mantissa, y
-    dey
-    bpl :-
-    iny
-    clc
-    ldx #3
-@add_next_char_to_rnd_seed:
-    lda random_mantissa, x
-    adc swap
-    asl
-    adc planet_name, y
-    sta random_mantissa, x
-    bcs :+
-    lda #0
-:
-    sta swap
-    dex
-    bpl :+
-    ldx #3
-:
-    iny
-    cpy planet_name_length
-    bcc @add_next_char_to_rnd_seed
-
     lda #$90             ; black
     jsr $ffd2
     lda #$93             ; clear screen
     jsr $ffd2
 
-    jsr chars_init
-    jsr map_init
     jsr joys_init
     jsr planes_init
     jsr sound_init
@@ -240,8 +145,6 @@ joys_irq:
 ; include independent support files before files that depend on them
 .include "sound/all.asm"
 .include "math/all.asm"
-.include "chars.asm"
-.include "map.asm"
 .include "joysticks-cga.asm"
 .include "players-move.asm"
 .include "death.asm"
@@ -253,15 +156,3 @@ joys_irq:
 
 bss:
 .bss
-
-map_current_tile_neighbors = bss
-* = map_current_tile_neighbors + 6
-
-; each written data area consecutively after loaded file
-map_tile_heights = (1 + .hibyte(*)) * 256
-
-currently_used_bss_end = map_tile_heights + map_tiles_total_count ; next data area can start here
-
-.out .sprintf("map_current_tile_neighbors = %d", map_current_tile_neighbors)
-.out .sprintf("map_tile_heights = %d", map_tile_heights)
-.out .sprintf("currently_used_bss_end = %d", currently_used_bss_end)
