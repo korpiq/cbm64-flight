@@ -24,8 +24,9 @@ start:
     jsr $ffd2
     lda #$93             ; clear screen
     jsr $ffd2
-    lda #6
+    lda #0
     sta $d020
+    lda #6
     sta $d021
 
     jsr joys_init
