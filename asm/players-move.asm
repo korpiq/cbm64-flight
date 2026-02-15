@@ -205,10 +205,10 @@ place_shadow: ; x = plane number 0-3; y = shadow sprite number 4-7
     RTS
 
 move_plane_ahead: ; x = plane number 0-3, y = plane sprite offset
-    clc
     lda plane_dx, x
     bmi @decrease_x
 ; increase x
+    clc
     adc plane_x_fragment, x
     sta plane_x_fragment, x
     bcc @x_done
@@ -244,12 +244,20 @@ move_plane_ahead: ; x = plane number 0-3, y = plane sprite offset
     lda plane_x_hi_bit, x
     eor #$01
     sta plane_x_hi_bit, x
+    bne :+
     lda bit_by_index, x
-    eor $d010
+    eor #$ff
+    and $d010
+    sta $d010
+    RTS
+:
+    lda bit_by_index, x
+    ora $d010
     sta $d010
     RTS
 
 @decrease_x:
+    clc
     adc plane_x_fragment, x
     sta plane_x_fragment, x
     bcs @x_done ; adding to two's complement sets carry unless sum is negative
@@ -265,12 +273,14 @@ move_plane_ahead: ; x = plane number 0-3, y = plane sprite offset
 @proceed_left:
     sec
     sbc #$01
+    bcs @place_sprite_x ; if on right side (hi bit on), going below zero means going to left side
+    pha
+    jsr @wrap_plane_x_hi_bit
+    pla
 
 @place_sprite_x:
     sta plane_x_lo, x
     sta $d000, y
-    bcs @x_done
-    jsr @wrap_plane_x_hi_bit
 
 @x_done:
     clc
