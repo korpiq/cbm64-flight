@@ -181,7 +181,7 @@ players_move:
     jmp @next_player
 
 place_shadow: ; x = plane number 0-3; y = shadow sprite number 4-7
-    lda sprite_pointers, x ; shape
+    lda #(ball_sprite_number + 3) ; shape
     sta sprite_pointers, y
     lda plane_x_hi_bit, x
     bne @shadow_right
