@@ -10,6 +10,10 @@ check_deaths:
 @check_primary_vs_secondary_plane:
     lda plane_alive, x
     beq @checked
+; check side of screen
+    lda plane_x_hi_bit, y
+    eor plane_x_hi_bit, x
+    bne @checked
 ; check vertical proximity
     lda plane_y, y
     sec
