@@ -214,19 +214,40 @@ move_plane_ahead: ; x = plane number 0-3, y = plane sprite offset
     bcc @x_done
 ; move sprite right
     lda plane_x_lo, x
+; past right screen edge?
+    cmp #$4c
+    bne @proceed_right
+; on the right side of the screen?
+    lda plane_x_hi_bit, x
+    bne @wrap_from_right_to_left_edge 
+    lda plane_x_lo, x
+@proceed_right:
     clc
     adc #$01
     sta plane_x_lo, x
     sta $d000, y
     bcc @x_done
+    jsr @wrap_plane_x_hi_bit
+    jmp @x_done
+
+ @wrap_from_right_to_left_edge:
+    jsr @wrap_plane_x_hi_bit
+    lda #$c
+    bne @place_sprite_x ; always jumps
+
+ @wrap_from_left_to_right_edge:
+    jsr @wrap_plane_x_hi_bit
+    lda #$4c
+    bne @place_sprite_x ; always jumps
+
+@wrap_plane_x_hi_bit:
     lda plane_x_hi_bit, x
     eor #$01
     sta plane_x_hi_bit, x
-; move plane right over 8 bit boundary
     lda bit_by_index, x
     eor $d010
     sta $d010
-    jmp @x_done
+    RTS
 
 @decrease_x:
     adc plane_x_fragment, x
@@ -234,18 +255,23 @@ move_plane_ahead: ; x = plane number 0-3, y = plane sprite offset
     bcs @x_done ; adding to two's complement sets carry unless sum is negative
 ; move sprite
     lda plane_x_lo, x
+; past left screen edge?
+    cmp #$c
+    bne @proceed_left
+; on the left side of the screen?
+    lda plane_x_hi_bit, x
+    beq @wrap_from_left_to_right_edge
+    lda plane_x_lo, x
+@proceed_left:
     sec
     sbc #$01
+
+@place_sprite_x:
     sta plane_x_lo, x
     sta $d000, y
-    bcs @set_y_position
-    lda plane_x_hi_bit, x
-    eor #$01
-    sta plane_x_hi_bit, x
-; move plane sprite left over 8 bit boundary
-    lda bit_by_index, x
-    eor $d010
-    sta $d010
+    bcs @x_done
+    jsr @wrap_plane_x_hi_bit
+
 @x_done:
     clc
     lda plane_dy, x
