@@ -296,7 +296,6 @@ move_plane_ahead: ; x = plane number 0-3, y = plane sprite offset
     cmp #$f0
     bcc @set_y_position
 ; cross pole to the other side
-    dec plane_y, x
     ; turn away from the pole
     lda plane_direction, x
     jsr bounce_from_south_edge
@@ -310,10 +309,15 @@ move_plane_ahead: ; x = plane number 0-3, y = plane sprite offset
     bcs @set_y_position
     dec plane_y, x
     lda plane_y, x
+; crossing screen edge?
     cmp #$25
     bcs @set_y_position
-    adc #$c0
-    sta plane_y, x
+; cross pole to the other side
+    ; turn away from the pole
+    lda plane_direction, x
+    jsr bounce_from_north_edge
+    sta plane_direction, x
+    jmp @set_y_position
 
 @set_y_position:    ; always update y position, because height might have changed
     lda plane_z, x
