@@ -13,8 +13,7 @@ start_tests:
     ldy #>string_tests_starting
     jsr $ab1e
 
-    ; jsr test_tile_addressing
-    jsr test_directions
+    jsr test_tile_addressing
 
     lda test_number
     jsr print_hex
@@ -34,7 +33,7 @@ string_tests_starting: .byte "starting tests\n", 0
 string_tests_done: .byte "tests done\n", 0
 string_test_failed: .byte "test failed\n", 0
 test_number: .byte 0
-tests_total = 8
+tests_total = 6
 
 .include "test_directions.asm"
 .include "../asm/main.asm"
