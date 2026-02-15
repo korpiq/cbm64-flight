@@ -295,7 +295,7 @@ move_plane_ahead: ; x = plane number 0-3, y = plane sprite offset
 ; crossing screen edge?
     cmp #$f0
     bcc @set_y_position
-; cross pole to the other side
+    jsr @cross_pole
     ; turn away from the pole
     lda plane_direction, x
     jsr bounce_from_south_edge
@@ -312,12 +312,43 @@ move_plane_ahead: ; x = plane number 0-3, y = plane sprite offset
 ; crossing screen edge?
     cmp #$25
     bcs @set_y_position
-; cross pole to the other side
+    jsr @cross_pole
     ; turn away from the pole
     lda plane_direction, x
     jsr bounce_from_north_edge
     sta plane_direction, x
     jmp @set_y_position
+
+@cross_pole: ; to other half of screen
+    lda plane_x_hi_bit, x
+    beq @cross_pole_from_left_side
+; cross pole from hi bit side – always lands left of the hi bit line
+    jsr @wrap_plane_x_hi_bit
+    lda plane_x_lo, x
+    clc
+    adc #$6c ; distance from center to hi bit line $60 + left side offset $c
+    sta plane_x_lo, x
+    bne @crossed_pole ; always jump
+@cross_pole_from_left_side: ; cross to other half of screen
+    lda plane_x_lo, x
+    clc
+    adc #$a0 ; offset by half screen width
+    sta plane_x_lo, x
+    bcc @crossed_pole
+ ; overflowing to hi bit side...
+    cmp #$4c ; over right edge?
+    bcs @crossed_pole_past_right_screen_edge
+    ; no, just land there
+    sta plane_x_lo, x
+    jmp @wrap_plane_x_hi_bit ; done and can return from there
+    ; TODO: past right side of screen
+@crossed_pole_past_right_screen_edge:
+    sec
+    sbc #$40
+    sta plane_x_lo, x
+
+@crossed_pole:
+    RTS
 
 @set_y_position:    ; always update y position, because height might have changed
     lda plane_z, x
