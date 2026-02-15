@@ -283,22 +283,28 @@ move_plane_ahead: ; x = plane number 0-3, y = plane sprite offset
     sta $d000, y
 
 @x_done:
-    clc
     lda plane_dy, x
     bmi @decrease_y
 ; increase y
+    clc
     adc plane_y_fragment, x
     sta plane_y_fragment, x
     bcc @set_y_position
     inc plane_y, x
     lda plane_y, x
-    cmp #$ef
+; crossing screen edge?
+    cmp #$f0
     bcc @set_y_position
-    sbc #$c8
-    sta plane_y, x
-    bne @set_y_position ; should always jump
+; cross pole to the other side
+    dec plane_y, x
+    ; turn away from the pole
+    lda plane_direction, x
+    jsr bounce_from_south_edge
+    sta plane_direction, x
+    jmp @set_y_position
 
 @decrease_y:
+    clc
     adc plane_y_fragment, x
     sta plane_y_fragment, x
     bcs @set_y_position
@@ -306,7 +312,7 @@ move_plane_ahead: ; x = plane number 0-3, y = plane sprite offset
     lda plane_y, x
     cmp #$25
     bcs @set_y_position
-    adc #$c8
+    adc #$c0
     sta plane_y, x
 
 @set_y_position:    ; always update y position, because height might have changed
