@@ -24,8 +24,6 @@ planes_init_shape_ptr: ; sprite shapes for $07f8 -
 
 sprite_pointers = $07f8
 
-sprites_data = $2000 ; sprite shapes copied to $40-byte boundary
-
 ball_sprite_number = plane_sprite_number + 16
 plane_sprite_number = <(sprites_data / $40)
 

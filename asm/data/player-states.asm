@@ -77,3 +77,12 @@ joystick_last_pressed_ticks_right:
     .dword 0
 joystick_last_pressed_ticks_button:
     .dword 0
+
+plane_exhaust_x:
+    .byte 0
+
+plane_exhaust_hi:
+    .byte 0
+
+plane_exhaust_y:
+    .byte 0

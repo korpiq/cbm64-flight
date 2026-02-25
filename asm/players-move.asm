@@ -5,20 +5,26 @@ players_move:
     lda #0
     sta $d001 + 2 * 4
     ldx #$03
+    stx plane_offset
     ldy #$06
+    sty plane_sprite_offset
 
 @each_player:
+    ldx plane_offset
     lda plane_alive, x
     bne @move_player
 
 @next_player:
+    ldy plane_sprite_offset
     dey
     dey
+    sty plane_sprite_offset
+    ldx plane_offset
     dex
-    bmi @players_moved
-    jmp @each_player
+    stx plane_offset
+    bpl @each_player
 
-@players_moved:
+; all players moved
     lda screen_drawing_round_counter
     and #$01
     tax
@@ -142,15 +148,13 @@ players_move:
     jsr set_plane_horizontal_direction
     jsr move_plane_ahead
     jsr move_plane_ahead
+    jmp @smoke_collision_checked
 
-; pollute map
-    txa
-    pha
-    tya
-    pha
-    lda #$d8
+; check smoke collision
+/*
+    lda >map_clouds
     sta map_tile_pointer + 1
-    lda plane_y, x
+    lda plane_y, x ; TODO: have plane_y_offset_by_z and use it instead
     tay
     lda plane_x_lo, x
     pha
@@ -161,23 +165,24 @@ players_move:
 ; check that it points on screen
     lda map_tile_pointer + 1
     cmp #$d8
-    bcc @polluted
+    bcc @smoke_collision_checked ; before screen, do not look there
     cmp #$db
     bcc :+
-    bne @polluted
+    bne @smoke_collision_checked
     lda map_tile_pointer
     cmp #$e8
-    bcs @polluted
+    bcs @smoke_collision_checked ; after screen, do not look there
 :
+    stx sprite_tmp
     ldx #0
-    lda #11
-    sta (map_tile_pointer,x)
-@polluted:
-    pla
-    tay
-    pla
-    tax
-
+    lda (map_tile_pointer,x)
+    bne @smoke_collision_checked ; no collision
+    ldx sprite_tmp
+    jsr plane_explode
+*/
+@smoke_collision_checked:
+    ldx plane_offset
+    ldy plane_sprite_offset
     jmp @next_player
 
 place_shadow: ; x = plane number 0-3; y = shadow sprite number 4-7
@@ -315,12 +320,14 @@ move_plane_ahead: ; x = plane number 0-3, y = plane sprite offset
     beq @cross_pole_from_left_side
 ; cross pole from hi bit side – always lands left of the hi bit line
     jsr @wrap_plane_x_hi_bit
+    inc plane_y, x
     lda plane_x_lo, x
     clc
     adc #$6c ; distance from center to hi bit line $60 + left side offset $c
     sta plane_x_lo, x
     bne @crossed_pole ; always jump
 @cross_pole_from_left_side: ; cross to other half of screen
+    dec plane_y, x
     lda plane_x_lo, x
     clc
     adc #$a0 ; offset by half screen width
@@ -546,8 +553,10 @@ animate_exhaust:
 @add_x:
     clc
     adc plane_x_lo, x
+    pha ; exhaust x lo
     sta $d000 + 2 * 4
     lda plane_x_hi_bit, x
+    pha ; exhaust x hi
     bne @right_side
     lda $d010
     and #$ef
@@ -576,6 +585,7 @@ animate_exhaust:
     clc
     adc $d001, y
     sta $d001 + 2 * 4
+    pha ; exhaust y
 ; color
     txa
     pha
@@ -597,6 +607,53 @@ animate_exhaust:
     adc #(ball_sprite_number)
     sta sprite_pointers + 4
 
+; draw smoke
+    lda #$d8
+    sta map_tile_pointer + 1
+    pla ; exhaust y
+    tay
+    pla ; exhaust x hi
+    tax
+    pla ; exhaust x lo
+    pha ; store for use
+    jsr sprite_char_pos
+pollute: ; map_tile_pointer = location; pla = nth smoke character
+; check that it points on screen
+    lda map_tile_pointer + 1
+    cmp #$d8
+    bcc @polluted ; before screen, do not draw there
+    cmp #$db
+    bcc :+
+    bne @polluted ; far after screen, do not draw there
+    lda map_tile_pointer
+    cmp #$e8
+    bcs @polluted ; slightly after screen, do not draw there
+:
+    ldx #0
+    lda #12 ; smoke color
+    sta (map_tile_pointer,x)
+    lda map_tile_pointer + 1
+    sec
+    sbc #$d4 ; color screen $d800+ => character screen $0400+
+    sta map_tile_pointer + 1
+    pla ; nth smoke character number
+    pha
+    and #$03
+    clc
+    adc #$1b ; first smoke cloud
+    sta (map_tile_pointer,x)
+/*
+    lda map_tile_pointer + 1
+    clc
+    adc #(>map_clouds - 4) ; move pointer from character screen to map_clouds
+    sta map_tile_pointer + 1
+    lda #1 ; nonzero = cloud
+    sta (map_tile_pointer,x)
+*/
+@polluted:
+    pla ; unstore unused
+    ldx plane_offset
+    ldy plane_sprite_offset
     RTS
 
 sprite_char_pos: ;  a = x lo, x = x hi, y = y, map_tile_pointer = start of screen

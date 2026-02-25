@@ -11,6 +11,8 @@ joystick_switch_bit = 5
 map_tile_pointer = 5
 sprite_tmp = $2a
 sound_buffer = $52
+plane_offset = $5c
+plane_sprite_offset = $5d
 map_build_x = $5c
 map_build_y = $5d
 map_build_height = $5e
@@ -18,6 +20,9 @@ map_build_surrounding_heights_offset = $5f
 current_map_tile_bag = $68
 random_exponent = $8b
 random_mantissa = $bc
+
+; memory reservations
+sprites_data = $2000 ; sprite shapes copied to $40-byte boundary
 
 start:
     lda #$9b             ; grey
@@ -29,6 +34,7 @@ start:
     lda #6
     sta $d021
 
+    jsr chars_init
     jsr joys_init
     jsr planes_init
     jsr sound_init
@@ -140,6 +146,7 @@ joys_irq:
     JMP $EA31            ; jump into KERNAL's standard interrupt service routine to handle keyboard scan, cursor display etc.
 
 ; include independent support files before files that depend on them
+.include "chars.asm"
 .include "sound/all.asm"
 .include "math/all.asm"
 .include "joysticks-cga.asm"
