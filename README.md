@@ -41,6 +41,14 @@ Requires
 dd bs=1 skip=20 count=$[ 64 * NUMBER_OF_SPRITES ] < original.spd > sprites-only.bin
 ```
 
+### local utilities
+
+In `util/` directory
+- `char-bin-from-decimal-list-text.pl` converts decimal number list from https://petscii.krissz.hu/ to binary
+- `dump-hex.pl` converts binary to hex for import to https://petscii.krissz.hu/
+- `dump-charmap.pl` shows contents of a binary charmap file as hex and ascii visualization
+- `dump-spritemap.pl` shows contents of a binary sprite file as hex and ascii visualization
+
 ## multiplication
 
 ## unsigned 8bit x 8bit
